@@ -400,3 +400,8 @@ def model_card(ok: bool, model: str, embed: str | None) -> str:
 def file_row(name: str, meta: str, lang_html: str, status_html: str) -> str:
     return (f'<div class="fx-file"><div class="ic">{icon("file", 16)}</div><div class="nm"><div class="a">{esc(name)}</div><div class="b">{esc(meta)}</div></div>'
             f'<div style="width:100px">{lang_html}</div><div style="width:170px">{status_html}</div></div>')
+
+
+def demo_card() -> str:
+    return ('<div class="fx-model"><div><span class="fx-dot" style="background:#6C5CE7"></span><b>Demo mode</b></div>'
+            '<div style="margin-top:6px">Read-only: real builds and results, no live model.</div></div>')

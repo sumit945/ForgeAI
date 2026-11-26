@@ -125,3 +125,24 @@ def test_uikit_escapes_untrusted_text():
                 ui.check_list([evil]), ui.cfg_row("db", evil, evil), ui.metric(evil, evil), ui.code_block(evil), ui.bubble("user", evil, evil), ui.iter_chain([(evil, evil, "")]),
                 ui.file_row(evil, evil, ui.esc(evil), "x"), ui.header(evil, evil), ui.kpi_cards([(evil, evil, evil)]), ui.model_card(True, evil, evil), ui.ring(50, evil), ui.log_block([evil])):
         assert "<img" not in out.replace("&lt;img", "")
+
+
+def test_demo_mode_is_read_only_and_shows_recorded_answers(tmp_path, monkeypatch):
+    d = make_run(tmp_path, "demo")
+    (d / "manual_test_answers.json").write_text(json.dumps([{"n": 1, "question": "How much?", "expected": "Rs. 799", "answer": "Rs. 799 per month.", "refused": False,
+                                                              "sources": ["a.pdf"], "auto_pass": True}]), encoding="utf-8")
+    monkeypatch.setenv("FORGEAI_ROOT", str(tmp_path))
+    monkeypatch.setenv("FORGEAI_DEMO", "1")
+    at = AppTest.from_file(str(UI), default_timeout=60)
+    at.session_state["page"] = "build"
+    at.session_state["workspace"] = str(tmp_path / "workspace")
+    at.run()
+    assert not at.exception and next(b for b in at.button if b.key == "start_build").disabled
+    assert any("Demo mode" in m.value for m in at.markdown)
+    at = AppTest.from_file(str(UI), default_timeout=60)
+    at.session_state["page"] = "runner"
+    at.session_state["workspace"] = str(tmp_path / "workspace")
+    at.run()
+    assert not at.exception, [str(e.value) for e in at.exception]
+    assert any("Recorded answers" in m.value for m in at.markdown)
+    assert any(e.label.startswith("1. How much?") for e in at.expander)

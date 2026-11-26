@@ -7,6 +7,7 @@ The pipeline runs unattended, so the wizard steps fill in live as stages finish;
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import tempfile
@@ -39,6 +40,19 @@ S.setdefault("workspace", str(ROOT / "workspace"))
 S.setdefault("msgs", {})
 S.setdefault("wiz", 0)  # step in view in the Build Agent wizard
 S.setdefault("brief_text", "")
+
+
+def _demo_flag() -> bool:
+    """Read-only demo (for hosting without Ollama): FORGEAI_DEMO=1 or a `demo = true` Streamlit secret."""
+    if os.environ.get("FORGEAI_DEMO", "").lower() in ("1", "true", "yes"):
+        return True
+    try:
+        return bool(st.secrets.get("demo", False))
+    except Exception:  # noqa: BLE001 - no secrets file configured
+        return False
+
+
+DEMO = _demo_flag()
 
 WIZ = ["Intake", "Requirements", "Agent Config", "Evaluate", "Optimize"]
 STAGES = [("intake", "Intake", "Clarifying questions and requirements"), ("groundability", "Groundability guard", "Can the documents support the brief?"), ("generate", "Generate agent", "Prompt, retrieval and tools"),
@@ -75,6 +89,17 @@ def health(host: str, model: str) -> dict:
         return {"ok": False, "model_ok": False, "embed": None, "models": []}
 
 
+def live() -> bool:
+    """Can this console build agents and chat right now? Needs a reachable Ollama with the model, and not demo mode."""
+    hh = health(S["host"], S["model"])
+    return (not DEMO) and hh["ok"] and hh["model_ok"]
+
+
+def offline_note() -> str:
+    return ("Demo mode: this site is read-only. Browse real builds, scores, reports and recorded answers. To build and chat with your own agents, run ForgeAI locally with Ollama (see the README)."
+            if DEMO else "The model server is not reachable, so building and chatting are switched off. Start Ollama and install the model, then reload.")
+
+
 def runs_list() -> list[dict]:
     return dd.list_runs([ROOT / "runs", Path(S["workspace"]) / "jobs"])
 
@@ -92,7 +117,7 @@ with st.sidebar:
         if st.button(label, key=f"nav_{key}", width="stretch"):
             go(key)
     h = health(S["host"], S["model"])
-    html('<div style="height:26vh"></div>' + ui.model_card(h["ok"] and h["model_ok"], S["model"], h["embed"]))
+    html('<div style="height:26vh"></div>' + (ui.demo_card() if DEMO else ui.model_card(h["ok"] and h["model_ok"], S["model"], h["embed"])))
 html(ui.topbar("U"))
 
 
@@ -269,7 +294,9 @@ def _step_intake(mgr: JobManager, d: dict | None) -> None:
                 S["target"] = b.slider("Stop at dev pass rate", 0.5, 1.0, S.get("target", 0.9), 0.05)
                 S["embed"] = c.text_input("Embedding model (blank = auto)", S.get("embed", ""))
                 S["fresh"] = st.checkbox("Generate a fresh eval set (ignore the cache)", S.get("fresh", False), help="By default a verified eval set from an identical earlier build is reused, which saves several minutes.")
-        ready = len(brief.split()) >= 4 and bool(ups) and not running
+        if not live():
+            html(ui.alert("info", offline_note(), "info"))
+        ready = len(brief.split()) >= 4 and bool(ups) and not running and live()
         a, b = st.columns([3, 1.4])
         if b.button("Start Build", type="primary", width="stretch", disabled=not ready, key="start_build"):
             try:
@@ -548,7 +575,19 @@ def page_runner() -> None:
                 st.markdown(m["content"])
                 if m.get("caption"):
                     st.caption(m["caption"])
-        q = st.chat_input("Ask in English, Hindi, Tamil, Bengali…")
+        if not live():
+            html(ui.alert("info", offline_note(), "info"))
+            rec = Path(r["path"]) / "manual_test_answers.json"
+            if rec.exists():
+                rows = json.loads(rec.read_text(encoding="utf-8"))
+                html(f'<div class="fx-h3" style="margin:12px 0 4px">Recorded answers ({len(rows)} questions)</div><div class="fx-muted">Real answers from this agent, recorded in a test run. Each is checked against the expected answer.</div>')
+                for x in rows:
+                    with st.expander(f"{x['n']}. {x['question']}"):
+                        st.markdown(x["answer"])
+                        st.caption(("Declined · " if x.get("refused") else "") + ("Sources: " + ", ".join(x.get("sources") or []) if x.get("sources") else "No sources") + f" · expected: {x['expected']} · automatic check: {'pass' if x['auto_pass'] else 'fail'}")
+            else:
+                html('<div class="fx-muted" style="margin-top:12px">No recorded answers for this agent.</div>')
+        q = st.chat_input("Ask in English, Hindi, Tamil, Bengali…", disabled=not live())
         if q:
             S["msgs"][key].append({"role": "user", "content": q})
             try:

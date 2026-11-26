@@ -169,3 +169,7 @@ Not done: prompt tournament, factory-vs-hand-written baseline, regression mode, 
 
 ## Layout
 `forgeai/` package | `forgeai/prompts/` every generation prompt | `demos/` briefs, synthetic sources and the prompts that produced them (`SYNTHESIS_PROMPTS.md`), Hindi corpus, optimizer repair demo | `runs/` committed artifacts | `stress/` 100-document corpora, stress and multilingual benchmarks | `tests/` 195 offline tests | `.github/workflows/tests.yml` CI.
+
+## Hosting the console
+
+A read-only demo (real builds, scores and reports, no live model) can be hosted free on Streamlit Community Cloud; steps in [DEPLOY.md](DEPLOY.md).
