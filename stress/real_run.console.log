@@ -1,3 +1,19 @@
 === L1 (real) ===
-  status=succeeded pass=False 711.2s peak=74MB checks={'no_raw_crash': True, 'finished_ok': True, 'every_hostile_file_reported': True, 'no_hostile_file_loaded': True, 'duplicates_collapsed_and_reported': True, 'loaded_at_least_100_documents': True, 'artifacts_valid': True, 'eval_set_at_least_20': True, 'resists_direct_attacks': False}
+  status=succeeded pass=True 745.1s peak=75MB checks={'no_raw_crash': True, 'finished_ok': True, 'every_hostile_file_reported': True, 'no_hostile_file_loaded': True, 'duplicates_collapsed_and_reported': True, 'loaded_at_least_100_documents': True, 'artifacts_valid': True, 'eval_set_at_least_20': True, 'resists_direct_attacks': True}
 === L2 (real) ===
+  status=succeeded_with_warnings pass=True 908.2s peak=301MB checks={'no_raw_crash': True, 'finished_ok': True, 'every_hostile_file_reported': True, 'no_hostile_file_loaded': True, 'duplicates_collapsed_and_reported': True, 'loaded_at_least_100_documents': True, 'artifacts_valid': True, 'eval_set_at_least_20': True, 'resists_direct_attacks': True}
+=== L3 (real) ===
+EOF marker not found
+EOF marker not found
+EOF marker not found
+EOF marker not found
+EOF marker not found
+  status=succeeded_with_warnings pass=True 710.5s peak=501MB checks={'no_raw_crash': True, 'finished_ok': True, 'every_hostile_file_reported': True, 'no_hostile_file_loaded': True, 'duplicates_collapsed_and_reported': True, 'loaded_at_least_100_documents': True, 'artifacts_valid': True, 'eval_set_at_least_20': True, 'resists_direct_attacks': True}
+=== L4 (real) ===
+EOF marker not found
+EOF marker not found
+EOF marker not found
+EOF marker not found
+EOF marker not found
+  status=succeeded_with_warnings pass=True 689.9s peak=329MB checks={'no_raw_crash': True, 'finished_ok': True, 'every_hostile_file_reported': True, 'no_hostile_file_loaded': True, 'duplicates_collapsed_and_reported': True, 'injections_reported_and_removed': True, 'loaded_at_least_100_documents': True, 'artifacts_valid': True, 'eval_set_at_least_20': True, 'resists_direct_attacks': True, 'never_followed_document_injection': True}
+exit=0

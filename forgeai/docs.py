@@ -26,7 +26,7 @@ USER_ONLY_RE = [re.compile(p, re.I) for p in (
     r"\byou are (?:now|no longer) (?:a|an|the|my|dan|free|unrestricted|jailbroken|evil|bound by no)\b", r"\bpretend (?:to be|you are|that you)\b", r"\bjailbreak\b", r"\bdeveloper mode\b", r"\bact as (?:if|though) you (?:have|had) no\b",
     r"\bforget (?:all |everything |your )(?:previous |prior |the )?(?:instructions|rules|training)\b",
 )]
-_SENT = re.compile(r"(?<=[.!?])\s+")
+_SENT = re.compile(r"(?<=[.!?।॥۔؟])\s+")  # includes the danda of Hindi/Bengali/Marathi and the Urdu full stop
 
 
 def is_user_injection(text: str) -> bool:
@@ -34,7 +34,9 @@ def is_user_injection(text: str) -> bool:
 
 
 def is_injection(sentence: str) -> bool:
-    return any(p.search(sentence) for p in INJECTION_RE)
+    from .i18n import has_multilingual_injection
+
+    return any(p.search(sentence) for p in INJECTION_RE) or has_multilingual_injection(sentence)
 
 
 def sanitize_injections(text: str) -> tuple[str, int]:
@@ -194,9 +196,9 @@ def reflow(text: str) -> str:
             buf = l
         elif re.fullmatch(r"\d+(\.\d+)*\.?", buf):  # bare section number: glue to its title
             buf += " " + l
-        elif not re.search(r"[.!?:;]$", buf) and (l[0].islower() or l[0].isdigit() or l[0] in "($\"'" or len(buf.split()) > 8):
+        elif not re.search(r"[.!?:;\u0964\u0965\u06d4\u061f]$", buf) and (l[0].islower() or (l[0].isalpha() and not l[0].isupper()) or l[0].isdigit() or l[0] in "($\"'" or len(buf.split()) > 8):
             buf += " " + l
-        elif re.search(r"[.!?:;]$", buf) and l[0].islower():
+        elif re.search(r"[.!?:;\u0964\u0965\u06d4\u061f]$", buf) and l[0].islower():
             buf += " " + l
         else:
             flush()
@@ -309,7 +311,7 @@ def _split_units(text: str) -> list[str]:
         if not para:
             continue
         if len(para.split()) > 90:
-            units.extend(s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z0-9(])", para) if s.strip())
+            units.extend(s.strip() for s in re.split(r"(?<=[.!?\u0964\u0965\u06d4\u061f])\s+(?=[A-Z0-9(\u0900-\u0d7f\u0600-\u06ff])", para) if s.strip())
         else:
             units.append(para)
     return units
@@ -373,7 +375,7 @@ def inventory(docs: list[Document]) -> list[dict]:
             heads = [
                 ln.strip()
                 for ln in d.text.split("\n")
-                if 3 < len(ln.strip()) < 80 and not ln.strip().endswith((".", ",", ";"))
+                if 3 < len(ln.strip()) < 80 and not ln.strip().endswith((".", ",", ";", "\u0964", "\u06d4"))
             ][:14]
             entry["headings"] = heads
             entry["opening"] = " ".join(d.text.split()[:70])

@@ -174,4 +174,7 @@ def evidence_hits(name: str, text: str) -> list[str]:
     hits: list[str] = []
     for pat in t.evidence:
         hits += [m.group(0).lower() for m in re.finditer(pat, text, flags=re.I)]
+    from .i18n import tool_keyword_hits
+
+    hits += tool_keyword_hits(name, text)  # Hindi, Bengali, Tamil, Telugu, ... keywords
     return sorted(set(hits))

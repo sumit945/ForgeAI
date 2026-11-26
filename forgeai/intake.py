@@ -7,6 +7,7 @@ from typing import Callable
 
 from .docs import Document, inventory, inventory_for_prompt
 from .errors import BudgetExceeded, ModelUnavailable
+from .lang import corpus_language
 from .llm import LLM
 from .prompts import render
 from .textutil import clean_escalation
@@ -100,6 +101,10 @@ def build_requirements(brief: str, docs: list[Document], qa: list[dict], llm: LL
         raise
     except Exception:  # noqa: BLE001
         d = {}
+    lang = corpus_language([doc.text for doc in docs] + [brief])
+    language_name = str(d.get("language") or "").strip() or lang["name"]
+    if lang["code"] != "en":  # the documents decide: a small model often answers "English" regardless
+        language_name = lang["name"]
     heads = []
     for doc in docs:
         heads += inventory([doc])[0].get("headings", [])[:3]
@@ -110,7 +115,9 @@ def build_requirements(brief: str, docs: list[Document], qa: list[dict], llm: LL
         "scope": str(d.get("scope") or brief.strip())[:400],
         "audience": str(d.get("audience") or "general users"),
         "tone": str(d.get("tone") or "clear, professional, concise"),
-        "language": str(d.get("language") or "English"),
+        "language": language_name,
+        "language_code": lang["code"],
+        "language_shares": lang["shares"],
         "must_answer_topics": _as_list(d.get("must_answer_topics")) or heads[:6],
         "must_refuse_topics": _as_list(d.get("must_refuse_topics"), 8)
         or ["Anything not stated in the provided documents", "Legal, medical or financial advice"],

@@ -16,6 +16,8 @@ import json
 import re
 
 from .errors import BudgetExceeded, ModelUnavailable
+from .i18n import refusal_heads
+from .lang import normalize_text
 from .llm import LLM
 from .prompts import render
 from .schemas import JudgeOut
@@ -31,10 +33,15 @@ REFUSAL_RE = re.compile(
 )
 
 
+_REFUSAL_HEADS = [h for h in refusal_heads() if len(h) > 12]
+
+
 def agent_refused(res: dict) -> bool:
     if res.get("refused"):
         return True
     a = res.get("answer", "")
+    if len(a.split()) < 60 and any(h in normalize_text(a) for h in _REFUSAL_HEADS):  # a refusal written in any supported language
+        return True
     return bool(REFUSAL_RE.search(a)) and len(a.split()) < 45
 
 

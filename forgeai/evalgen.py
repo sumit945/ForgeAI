@@ -9,6 +9,9 @@ from collections import Counter
 
 from .docs import Document, chunk_documents
 from .groundability import check_topic
+from .i18n import PROBES as I18N_PROBES
+from .i18n import SEEDS
+from .lang import LANGS, corpus_language
 from .errors import BudgetExceeded, ModelUnavailable
 from .llm import LLM
 from .prompts import render
@@ -32,7 +35,7 @@ SEED_OFFTOPIC = [
 
 def sane_question(q: str) -> bool:
     q = q.strip()
-    return q.endswith("?") and 4 <= len(q.split()) <= 45 and "{" not in q and not re.search(r"\bQuestion \d", q)
+    return q.endswith(("?", "\u061f")) and 4 <= len(q.split()) <= 45 and "{" not in q and not re.search(r"\bQuestion \d", q)
 
 
 def good_fact(f: str) -> bool:
@@ -57,6 +60,7 @@ class Gen:
         self.stats = Counter()
         self.rejected: list[dict] = []
         self.asked: dict[str, list[str]] = {}
+        self.lang_label = "English"
 
     def reject(self, kind: str, reason: str, detail: str = "") -> None:
         self.stats[f"rejected:{reason}"] += 1
@@ -92,7 +96,7 @@ def _passages(docs: list[Document], rnd: random.Random):
 
 def _answerable(g: Gen, llm: LLM, passage, category="answerable") -> dict | None:
     asked = g.asked.setdefault(passage.id, [])
-    sysm, user = render("evalgen_answerable", doc=passage.doc, passage=passage.text, avoid=" | ".join(asked) or "(none)")
+    sysm, user = render("evalgen_answerable", doc=passage.doc, passage=passage.text, avoid=" | ".join(asked) or "(none)", language=g.lang_label)
     try:
         d = llm.json(sysm, user, task="evalgen_answerable", schema=AnswerableOut, max_tokens=350, temperature=0.2 if not asked else 0.7)
     except (BudgetExceeded, ModelUnavailable):  # never swallow a budget stop or an outage
@@ -104,7 +108,7 @@ def _answerable(g: Gen, llm: LLM, passage, category="answerable") -> dict | None
     if q:
         asked.append(q)
     facts = [str(f).strip() for f in d.get("key_facts", []) if str(f).strip()] if isinstance(d.get("key_facts"), list) else []
-    if len(q.split()) < 4 or not q.endswith("?"):
+    if len(q.split()) < 4 or not q.endswith(("?", "\u061f")):
         g.reject(category, "bad_question", q)
         return None
     if not facts:
@@ -156,6 +160,11 @@ def generate_eval_set(
     quotas = dict(quotas or DEFAULT_QUOTAS)
     rnd = random.Random(seed)
     g = Gen()
+    corp = corpus_language([d.text for d in docs])
+    code = req.get("language_code") or corp["code"]
+    g.lang_label = LANGS[code]["name"] + (f" (write in {LANGS[code]['script'].capitalize()} script)" if code not in ("en", "hi-Latn") else "")
+    seeds = SEEDS.get(code, SEEDS["en"])
+    probes_t = I18N_PROBES.get(code, I18N_PROBES["en"])
     order, all_chunks = _passages(docs, rnd)
     retr = Retriever(chunk_documents(docs, 120, 30))
 
@@ -179,7 +188,7 @@ def generate_eval_set(
     # 2) ambiguous = informal paraphrase of an answerable case (also exercises retrieval robustness)
     for c in to_para:
         chunk = next((x for x in all_chunks if x.id == c["source_chunk"] or x.doc == c["expected_sources"][0] and contains(x.text, c["expected_facts"][0])), None)
-        sysm, user = render("evalgen_paraphrase", passage=chunk.text if chunk else c["evidence_quotes"][0], question=c["question"])
+        sysm, user = render("evalgen_paraphrase", language=g.lang_label, passage=chunk.text if chunk else c["evidence_quotes"][0], question=c["question"])
         try:
             q = str(llm.json(sysm, user, task="evalgen_paraphrase", max_tokens=150).get("question", "")).strip()
         except (BudgetExceeded, ModelUnavailable):  # never swallow a budget stop or an outage
@@ -204,7 +213,7 @@ def generate_eval_set(
             continue
         cand.sort(key=lambda x: -x[0])
         b = cand[min(len(cand) - 1, rnd.randint(0, 2))][1]
-        sysm, user = render("evalgen_multidoc", doc_a=a.doc, passage_a=a.text, doc_b=b.doc, passage_b=b.text)
+        sysm, user = render("evalgen_multidoc", language=g.lang_label, doc_a=a.doc, passage_a=a.text, doc_b=b.doc, passage_b=b.text)
         try:
             d = llm.json(sysm, user, task="evalgen_multidoc", max_tokens=350)
         except (BudgetExceeded, ModelUnavailable):  # never swallow a budget stop or an outage
@@ -264,7 +273,7 @@ def generate_eval_set(
     sample = " ".join(c.text for c in order[:3])[:1400]
     nm_raw: list[str] = []
     try:
-        sysm, user = render("evalgen_nearmiss", n="6", topic=req["purpose"], sample=sample)
+        sysm, user = render("evalgen_nearmiss", language=g.lang_label, n="6", topic=req["purpose"], sample=sample)
         nm = llm.json(sysm, user, task="evalgen_nearmiss", schema=QuestionListOut, max_tokens=400)
         nm_raw = list(nm["questions"])
     except (BudgetExceeded, ModelUnavailable):  # never swallow a budget stop or an outage
@@ -274,7 +283,7 @@ def generate_eval_set(
     gaps = [f"What is the policy or procedure regarding {x}?" for x in req.get("known_gaps", [])[:2]]
     # domain-agnostic probes: on-topic wording that asks for information no policy document would hold
     topics = [t for t in req.get("must_answer_topics", []) if len(t.split()) <= 6] or [req["purpose"]]
-    probes = [PROBES[i % len(PROBES)].format(t=t) for i, t in enumerate(topics[: len(PROBES) * 2])]
+    probes = [probes_t[i % len(probes_t)].format(t=t) for i, t in enumerate(topics[: len(probes_t) * 2])]
     rnd.shuffle(probes)
     for q in gaps + nm_raw + probes:
         if g.stats["accepted:near_miss"] >= quotas["near_miss"]:
@@ -296,14 +305,14 @@ def generate_eval_set(
     # 5) off-topic / must-refuse / injection
     off: list[str] = []
     try:
-        sysm, user = render("evalgen_offtopic", n="3", purpose=req["purpose"], refuse=req["must_refuse_topics"])
+        sysm, user = render("evalgen_offtopic", language=g.lang_label, n="3", purpose=req["purpose"], refuse=req["must_refuse_topics"])
         o = llm.json(sysm, user, task="evalgen_offtopic", schema=QuestionListOut, max_tokens=300)
         off = list(o["questions"])
     except (BudgetExceeded, ModelUnavailable):  # never swallow a budget stop or an outage
         raise
     except Exception as e:  # noqa: BLE001
         g.reject("off_topic", "llm_failure", str(e))
-    for q in SEED_OFFTOPIC[2:] + off + SEED_OFFTOPIC[:2]:  # injection first, then generated, then generic seeds
+    for q in seeds[2:] + off + seeds[:2]:  # injection first, then generated, then generic seeds
         if g.stats["accepted:off_topic"] >= quotas["off_topic"]:
             break
         if len(q.split()) < 3 or "{" in q or len(q.split()) > 45:

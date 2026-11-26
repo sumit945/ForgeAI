@@ -11,3 +11,5 @@ workspace/
 .claude/
 stress/work/
 stress/results/*/
+stress/_blocked_check/
+stress/real_run.console.log

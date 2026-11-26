@@ -6,6 +6,7 @@ import re
 from collections import Counter
 
 from .docs import Chunk
+from .lang import STOP_INDIC, TOKEN_RE, normalize_text, stem_indic
 
 STOP = set(
     """a an the and or but if of to in on at by for with from as is are was were be been being it its this that these those
@@ -25,9 +26,17 @@ def stem(w: str) -> str:
 
 
 def tokenize(text: str, keep_stop: bool = False) -> list[str]:
-    toks = re.findall(r"[a-z0-9]+(?:[.,][0-9]+)*", text.lower())
-    toks = [t.replace(",", "") for t in toks]
-    return [stem(t) for t in toks if keep_stop or t not in STOP]
+    """Unicode-aware tokens: English words are stemmed as before; Indian-language words are normalised (native digits ->
+    ASCII, danda/nukta/joiners removed), stop-listed and, for the Dravidian scripts, truncation-stemmed."""
+    out: list[str] = []
+    for tok in TOKEN_RE.findall(normalize_text(text)):
+        tok = tok.replace(",", "")
+        if tok.isascii():
+            if keep_stop or tok not in STOP:
+                out.append(stem(tok))
+        elif keep_stop or tok not in STOP_INDIC:
+            out.append(stem_indic(tok))
+    return out
 
 
 class Retriever:

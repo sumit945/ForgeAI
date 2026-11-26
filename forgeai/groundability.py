@@ -13,6 +13,8 @@ import re
 
 from .docs import Document, chunk_documents
 from .errors import BudgetExceeded, ModelUnavailable
+from .i18n import has_modal
+from .lang import normalize_text
 from .llm import LLM
 from .prompts import render
 from .schemas import GroundCheckOut
@@ -34,7 +36,7 @@ def evidence_sentence(topic: str, texts: list[str]) -> tuple[str | None, float]:
     best, best_s = None, 0.0
     for t in texts:
         for sent in SENT_SPLIT.split(t):
-            if len(sent.split()) < 4 or not (re.search(r"\d", sent) or MODAL.search(sent)):
+            if len(sent.split()) < 4 or not (re.search(r"\d", normalize_text(sent)) or MODAL.search(sent) or has_modal(sent)):
                 continue
             sc = len(tt & set(tokenize(sent))) / len(tt)
             if sc > best_s:

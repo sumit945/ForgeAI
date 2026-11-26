@@ -10,6 +10,7 @@ from .docs import Document, chunk_documents, load_folder
 from .generator import render_system_prompt
 from .llm import LLM, extract_json
 from .docs import is_user_injection
+from .lang import detect_language
 from .embeddings import get_embedder
 from .errors import ModelUnavailable
 from .retrieval import HybridRetriever, Retriever
@@ -90,14 +91,16 @@ class Agent:
 
     def answer(self, question: str, history: list[dict] | None = None) -> dict:
         sp = self.defn["system_prompt"]
+        qlang = detect_language(question)  # the user may write in any supported Indian language; reply (and refuse) in it
+        refusal = sp.get("refusal_messages", {}).get(qlang["code"]) or sp["refusal_message"]
         if is_user_injection(question):  # input guardrail: a small model cannot be trusted to resist these, so never ask it
-            return {"question": question, "retrieved": [], "tool_calls": [], "violations": [], "answer": sp["refusal_message"],
+            return {"question": question, "retrieved": [], "tool_calls": [], "violations": [], "answer": refusal, "lang": qlang["code"],
                     "refused": True, "sources": [], "evidence": [], "deterministic_refusal": True, "guard": "prompt_injection"}
         hits = self.retrieve(question, history)
         retrieved = [{"id": c.id, "doc": c.doc, "score": round(s, 2), "text": c.text} for c, s in hits]
-        base = {"question": question, "retrieved": retrieved, "tool_calls": [], "violations": []}
+        base = {"question": question, "retrieved": retrieved, "tool_calls": [], "violations": [], "lang": qlang["code"]}
         if not hits and not self.tools:
-            return {**base, "answer": sp["refusal_message"], "refused": True, "sources": [], "evidence": [], "deterministic_refusal": True}
+            return {**base, "answer": refusal, "refused": True, "sources": [], "evidence": [], "deterministic_refusal": True}
 
         ctx = "\n\n".join(f"[{c.doc}]\n{c.text}" for c, _ in hits) or "(no relevant excerpts were found)"
         msgs = [{"role": "system", "content": self.system}]
@@ -123,7 +126,14 @@ class Agent:
                 ]
                 continue
             break
-        return {**base, **self._normalise(parsed, raw, base["tool_calls"], retrieved)}
+        out = {**base, **self._normalise(parsed, raw, base["tool_calls"], retrieved)}
+        if out["answer"] and qlang["confidence"] >= 0.5:
+            a_lang = detect_language(out["answer"])
+            if out["refused"] and (a_lang["script"] != qlang["script"] or out["answer"].strip() == sp["refusal_message"].strip()):
+                out["answer"] = refusal  # a refusal always comes back in the user's language, with the configured contact
+            elif not out["refused"] and a_lang["script"] != qlang["script"] and qlang["script"] != "latin":
+                out["violations"] = [*out["violations"], "wrong_language"]  # e.g. the model answered a Hindi question in English
+        return out
 
     def _normalise(self, parsed, raw: str, tool_calls: list, retrieved: list | None = None) -> dict:
         v: list[str] = []

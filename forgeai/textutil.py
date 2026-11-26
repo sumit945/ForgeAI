@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import re
 
+from .lang import TEXT_CLASS, normalize_text
 from .retrieval import tokenize
 
 
 def norm(s: str) -> str:
-    s = s.lower().replace("’", "'")
+    s = normalize_text(s).replace("’", "'")  # lower-case, native digits -> ASCII, danda -> '.', joiners dropped
     s = re.sub(r"(?<=\d),(?=\d{3}\b)", "", s)  # 1,200 -> 1200
-    s = re.sub(r"[^a-z0-9.%$ ]+", " ", s)
+    s = re.sub(rf"[^a-z0-9{TEXT_CLASS}.%$ ]+", " ", s)
     s = re.sub(r"(?<![0-9])\.|\.(?![0-9])", " ", s)  # sentence dots, keep decimals
     return re.sub(r"\s+", " ", s).strip()
 
@@ -43,6 +44,7 @@ def clean_escalation(e: str, default: str = "the relevant team") -> str:
 
 
 def numbers(s: str) -> set[str]:
+    s = normalize_text(s)  # Devanagari / Bengali / Tamil ... digits count as numbers too
     s = re.sub(r"(?<=\d),(?=\d{3}\b)", "", s)
     return {n.rstrip(".") for n in re.findall(r"\d+(?:\.\d+)?", s)}
 

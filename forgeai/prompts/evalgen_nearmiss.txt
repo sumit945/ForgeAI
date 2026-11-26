@@ -3,6 +3,7 @@ You write adversarial test questions. Given the TOPIC of a document collection a
 Each question must be a complete, plain sentence ending in "?". Do not number them, do not add explanations.
 Example for a canteen policy collection: {"questions":["How much does the canteen charge for a vegan dinner?","Can staff bring guests to the canteen on Saturdays?"]}
 Reply with JSON only: {"questions":[ ... ]}
+Write the questions in <<language>>.
 ### USER
 TOPIC: <<topic>>
 

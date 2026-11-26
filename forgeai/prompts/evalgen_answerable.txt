@@ -6,6 +6,7 @@ Rules:
 - The question must not quote the answer and must make sense without seeing the passage (no "according to the passage").
 - Vary phrasing: do not start every question with "What is".
 Reply with JSON only: {"question":"...","key_facts":["..."],"answer":"one-sentence reference answer"}
+Write the question and the reference answer in <<language>>. Keep the JSON keys in English; copy key_facts exactly as they appear in the passage.
 ### USER
 PASSAGE (from <<doc>>):
 <<passage>>

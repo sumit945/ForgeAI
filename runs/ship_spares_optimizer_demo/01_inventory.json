@@ -1,0 +1,84 @@
+{
+  "documents": [
+    {
+      "name": "procurement_procedure.pdf",
+      "kind": "text",
+      "words": 305,
+      "headings": [
+        "FLEET PROCUREMENT PROCEDURE - SPARE PARTS",
+        "Procedure PRO-12, effective 1 February 2026 1. Approval limits",
+        "2. Quotations",
+        "3. Critical spares",
+        "4. Emergency purchases",
+        "5. Delivery and receipt",
+        "6. Documentation"
+      ],
+      "opening": "FLEET PROCUREMENT PROCEDURE - SPARE PARTS Procedure PRO-12, effective 1 February 2026 1. Approval limits Purchase orders up to 2,000 USD may be approved by the Technical Superintendent. Orders above 2,000 USD and up to 10,000 USD require the approval of the Fleet Manager. Orders above 10,000 USD require the approval of the Technical Director. An order must never be split to stay under an approval limit. 2. Quotations For"
+    },
+    {
+      "name": "spares_catalogue.csv",
+      "kind": "csv",
+      "words": 148,
+      "columns": [
+        "part_no",
+        "description",
+        "category",
+        "criticality_class",
+        "supplier_code",
+        "unit_price_usd",
+        "lead_time_days",
+        "stock_on_hand",
+        "min_order_qty"
+      ],
+      "rows": 36,
+      "sample_rows": [
+        {
+          "part_no": "MP-1001",
+          "description": "Fuel injector, main engine",
+          "category": "Engine",
+          "criticality_class": "A",
+          "supplier_code": "HLM",
+          "unit_price_usd": "412.5",
+          "lead_time_days": "21",
+          "stock_on_hand": "6",
+          "min_order_qty": "2"
+        },
+        {
+          "part_no": "MP-1002",
+          "description": "Piston ring set, 6-cylinder",
+          "category": "Engine",
+          "criticality_class": "B",
+          "supplier_code": "NWE",
+          "unit_price_usd": "1840.0",
+          "lead_time_days": "35",
+          "stock_on_hand": "2",
+          "min_order_qty": "1"
+        },
+        {
+          "part_no": "MP-1003",
+          "description": "Turbocharger cartridge",
+          "category": "Engine",
+          "criticality_class": "C",
+          "supplier_code": "NWE",
+          "unit_price_usd": "9650.0",
+          "lead_time_days": "56",
+          "stock_on_hand": "1",
+          "min_order_qty": "1"
+        }
+      ]
+    },
+    {
+      "name": "supplier_terms.pdf",
+      "kind": "text",
+      "words": 331,
+      "headings": [
+        "SUPPLIER TERMS OF TRADE - APPROVED SPARES SUPPLIERS",
+        "2. Northwind Engineering (supplier code NWE)",
+        "3. Pacific Valve and Pump (supplier code PVP)",
+        "4. Supplier changes"
+      ],
+      "opening": "SUPPLIER TERMS OF TRADE - APPROVED SPARES SUPPLIERS Maintained by Fleet Procurement, revision 7, March 2026 1. Harbourline Marine Supply (supplier code HLM) Payment terms are net 30 days from invoice date. An order discount of 5 percent applies to orders with a value above 5,000 USD before freight. Freight is free for orders above 2,500 USD; for smaller orders a flat freight charge of 120 USD applies to any"
+    }
+  ],
+  "load_problems": []
+}
