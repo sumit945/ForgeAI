@@ -1,0 +1,1 @@
+Build an assistant that advises traders on cryptocurrency staking yields, validator slashing risk and token vesting schedules.

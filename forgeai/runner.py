@@ -9,6 +9,7 @@ from pathlib import Path
 from .docs import Document, chunk_documents, load_folder
 from .generator import render_system_prompt
 from .llm import LLM, extract_json
+from .docs import is_user_injection
 from .embeddings import get_embedder
 from .errors import ModelUnavailable
 from .retrieval import HybridRetriever, Retriever
@@ -89,6 +90,9 @@ class Agent:
 
     def answer(self, question: str, history: list[dict] | None = None) -> dict:
         sp = self.defn["system_prompt"]
+        if is_user_injection(question):  # input guardrail: a small model cannot be trusted to resist these, so never ask it
+            return {"question": question, "retrieved": [], "tool_calls": [], "violations": [], "answer": sp["refusal_message"],
+                    "refused": True, "sources": [], "evidence": [], "deterministic_refusal": True, "guard": "prompt_injection"}
         hits = self.retrieve(question, history)
         retrieved = [{"id": c.id, "doc": c.doc, "score": round(s, 2), "text": c.text} for c, s in hits]
         base = {"question": question, "retrieved": retrieved, "tool_calls": [], "violations": []}

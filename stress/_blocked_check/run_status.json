@@ -1,0 +1,19 @@
+{
+  "status": "blocked",
+  "pipeline_version": "2",
+  "stages": [
+    {
+      "name": "intake",
+      "status": "ok",
+      "seconds": 28.5
+    },
+    {
+      "name": "groundability",
+      "status": "ok",
+      "seconds": 43.4
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "elapsed_seconds": 74.1
+}

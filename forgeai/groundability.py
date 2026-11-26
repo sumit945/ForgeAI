@@ -99,17 +99,34 @@ def groundability_guard(req: dict, docs: list[Document], llm: LLM | None) -> tup
     """Returns (report, narrowed_requirements)."""
     retr = Retriever(chunk_documents(docs, 120, 30))
     topics = []
+    # A topic only counts if the BRIEF asked for it. Small models like to "helpfully" add topics lifted from the document
+    # inventory; those would be trivially supported and could mask an unsupportable brief.
+    brief_toks = {t for t in tokenize(req.get("brief", "")) if len(t) > 3}
+
+    def _requested(topic: str) -> bool:
+        tt = {t for t in tokenize(topic) if len(t) > 3}
+        return not brief_toks or not tt or bool(tt & brief_toks)
+
+    flags = {t: _requested(t) for t in req["must_answer_topics"]}
+    if not any(flags.values()):  # nothing overlaps the brief wording at all: fall back to trusting the list
+        flags = {t: True for t in flags}
     for t in req["must_answer_topics"]:
+        if not flags[t]:
+            topics.append({"topic": t, "verdict": "not_requested", "coverage": None,
+                           "notes": ["not asked for in the brief (added by the requirements model); ignored and removed from scope"]})
+            continue
         if _tool_covered(t):
             topics.append({"topic": t, "verdict": "supported_by_tool", "coverage": None, "notes": ["answerable via a live tool, not documents"]})
         else:
             topics.append(check_topic(t, retr, llm))
     purpose = check_topic(req["purpose"], retr, llm) if not _tool_covered(req["purpose"]) else {"verdict": "supported_by_tool"}
 
-    ok = [t for t in topics if t["verdict"] in ("supported", "supported_by_tool")]
-    partial = [t for t in topics if t["verdict"] == "partial"]
-    bad = [t for t in topics if t["verdict"] == "unsupported"]
-    n = max(1, len(topics))
+    ignored = [t for t in topics if t["verdict"] == "not_requested"]
+    topics_req = [t for t in topics if t["verdict"] != "not_requested"]
+    ok = [t for t in topics_req if t["verdict"] in ("supported", "supported_by_tool")]
+    partial = [t for t in topics_req if t["verdict"] == "partial"]
+    bad = [t for t in topics_req if t["verdict"] == "unsupported"]
+    n = max(1, len(topics_req))
     if (not ok and not partial) or len(bad) / n >= 0.6:
         status = "blocked"
     elif bad or partial:
@@ -119,7 +136,7 @@ def groundability_guard(req: dict, docs: list[Document], llm: LLM | None) -> tup
 
     gaps = [t["topic"] for t in bad]
     narrowed = dict(req)
-    narrowed["must_answer_topics"] = [t["topic"] for t in topics if t["verdict"] != "unsupported"]
+    narrowed["must_answer_topics"] = [t["topic"] for t in topics if t["verdict"] not in ("unsupported", "not_requested")]
     narrowed["known_gaps"] = gaps
     narrowed["must_refuse_topics"] = list(req["must_refuse_topics"]) + [
         f"{g} (the documents do not cover this - say so instead of guessing)" for g in gaps
@@ -128,7 +145,7 @@ def groundability_guard(req: dict, docs: list[Document], llm: LLM | None) -> tup
         "status": status,
         "purpose_check": purpose,
         "topics": topics,
-        "summary": {"supported": len(ok), "partial": len(partial), "unsupported": len(bad)},
+        "summary": {"supported": len(ok), "partial": len(partial), "unsupported": len(bad), "ignored_not_in_brief": len(ignored)},
         "known_gaps": gaps,
         "message": {
             "ok": "All requested topics are supported by the documents.",

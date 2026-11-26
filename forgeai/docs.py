@@ -21,7 +21,16 @@ INJECTION_RE = [re.compile(p, re.I) for p in (
     r"from now on,? (?:you|answer|reply|respond)",
     r"you (?:must|should|will) (?:now )?(?:answer|reply|respond) (?:only )?(?:with )?['\"]?[A-Z]{3,}",
 )]
+# Extra patterns that are only checked on USER input (too common in ordinary document prose, e.g. "you are now eligible").
+USER_ONLY_RE = [re.compile(p, re.I) for p in (
+    r"\byou are now\b", r"\bpretend (?:to be|you are|that you)\b", r"\bjailbreak\b", r"\bdeveloper mode\b", r"\bact as (?:if|though) you (?:have|had) no\b",
+    r"\bforget (?:all |everything |your )(?:previous |prior |the )?(?:instructions|rules|training)\b",
+)]
 _SENT = re.compile(r"(?<=[.!?])\s+")
+
+
+def is_user_injection(text: str) -> bool:
+    return is_injection(text) or any(p.search(text) for p in USER_ONLY_RE)
 
 
 def is_injection(sentence: str) -> bool:

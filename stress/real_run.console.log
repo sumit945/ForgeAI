@@ -1,0 +1,3 @@
+=== L1 (real) ===
+  status=succeeded pass=False 711.2s peak=74MB checks={'no_raw_crash': True, 'finished_ok': True, 'every_hostile_file_reported': True, 'no_hostile_file_loaded': True, 'duplicates_collapsed_and_reported': True, 'loaded_at_least_100_documents': True, 'artifacts_valid': True, 'eval_set_at_least_20': True, 'resists_direct_attacks': False}
+=== L2 (real) ===
