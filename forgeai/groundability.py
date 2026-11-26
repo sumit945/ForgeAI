@@ -43,8 +43,9 @@ def evidence_sentence(topic: str, texts: list[str]) -> tuple[str | None, float]:
 
 
 def check_topic(topic: str, retr: Retriever, llm: LLM | None) -> dict:
-    hits = retr.search(topic, top_k=3)
-    excerpts = "\n---\n".join(f"[{c.doc}] {c.text}" for c, _ in hits)
+    wide = 8 if len({c.doc for c in retr.chunks}) > 10 else 3  # many documents share a pattern: look at more of them
+    hits = retr.search(topic, top_k=wide)
+    excerpts = "\n---\n".join(f"[{c.doc}] {c.text}" for c, _ in hits[:3])
     union = set(tokenize(" ".join(c.text for c, _ in hits)))
     topic_toks = [t for t in set(tokenize(topic)) if len(t) > 2]
     coverage = (sum(1 for t in topic_toks if t in union) / len(topic_toks)) if topic_toks else 0.0
@@ -64,7 +65,7 @@ def check_topic(topic: str, retr: Retriever, llm: LLM | None) -> dict:
             verdict = str(d.get("verdict", "")).lower().strip()
             res["llm_verdict"] = verdict
             res["quote"] = str(d.get("quote", ""))
-            res["quote_verified"] = quote_in(res["quote"], excerpts)
+            res["quote_verified"] = quote_in(res["quote"], "\n".join(c.text for c, _ in hits))
         except (BudgetExceeded, ModelUnavailable):  # never swallow a budget stop or an outage
             raise
         except Exception as e:  # noqa: BLE001

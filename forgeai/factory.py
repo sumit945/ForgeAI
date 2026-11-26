@@ -198,7 +198,8 @@ def run_factory(
         # ---- 2. groundability ----------------------------------------------------
         def _guard():
             rep, narrowed = groundability_guard(req, docs, llm)
-            return {"report": rep, "req": validate_requirements(narrowed)}
+            # a BLOCKED report legitimately has no supported topics left; only validate when an agent will be generated
+            return {"report": rep, "req": narrowed if rep["status"] == "blocked" else validate_requirements(narrowed)}
 
         g = run.stage("groundability", (req,), _guard)
         report, req = g["report"], g["req"]

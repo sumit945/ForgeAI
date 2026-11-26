@@ -5,7 +5,7 @@ import json
 import re
 from typing import Callable
 
-from .docs import Document, inventory
+from .docs import Document, inventory, inventory_for_prompt
 from .errors import BudgetExceeded, ModelUnavailable
 from .llm import LLM
 from .prompts import render
@@ -16,7 +16,7 @@ MAX_QUESTIONS = 5
 
 
 def propose_questions(brief: str, docs: list[Document], llm: LLM) -> list[dict]:
-    sysm, user = render("intake_questions", max_q=str(MAX_QUESTIONS), brief=brief, inventory=inventory(docs))
+    sysm, user = render("intake_questions", max_q=str(MAX_QUESTIONS), brief=brief, inventory=inventory_for_prompt(docs))
     try:
         data = llm.json(sysm, user, task="intake_questions", schema=QuestionsOut, max_tokens=600)
         qs = data.get("questions", []) if isinstance(data, dict) else data
@@ -91,7 +91,7 @@ def build_requirements(brief: str, docs: list[Document], qa: list[dict], llm: LL
     qa_txt = "\n".join(
         f"- {q['question']} -> {q['answer']}" + ("  [ASSUMED DEFAULT]" if q["source"] != "requester" else "") for q in qa
     ) or "(no questions were needed)"
-    sysm, user = render("requirements", brief=brief, qa=qa_txt, inventory=inventory(docs))
+    sysm, user = render("requirements", brief=brief, qa=qa_txt, inventory=inventory_for_prompt(docs))
     try:
         d = llm.json(sysm, user, task="requirements", schema=RequirementsOut, max_tokens=900)
         if not isinstance(d, dict):

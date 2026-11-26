@@ -154,8 +154,9 @@ class JobManager:
         p = dict(j["params"])
 
         def log(m):
-            j["log"].append(str(m))
-            del j["log"][:-400]  # keep the last 400 lines
+            with self.lock:
+                j["log"].append(str(m))
+                del j["log"][:-400]  # keep the last 400 lines
 
         try:
             llm = self.llm_factory(p)
@@ -175,15 +176,23 @@ class JobManager:
             with self.lock:
                 self._save(j)
 
+    def snapshot(self) -> list[dict]:
+        with self.lock:
+            return list(self.jobs.values())
+
     def public(self, j: dict, log_tail: int = 40) -> dict:
-        out = {k: v for k, v in j.items() if k != "log"}
-        out["log"] = j["log"][-log_tail:]
+        with self.lock:  # the worker thread mutates the job while API threads read it
+            out = {k: (list(v) if isinstance(v, list) else dict(v) if isinstance(v, dict) else v) for k, v in j.items() if k != "log"}
+            out["log"] = list(j["log"][-log_tail:]) if log_tail else []
         rs = self._dir(j["id"]) / "run" / "run_status.json"
-        if rs.exists():
+        for _ in range(5):  # the file may be mid-replace (Windows sharing violation) or half-visible
             try:
                 out["run_status"] = json.loads(rs.read_text(encoding="utf-8"))
-            except ValueError:
-                pass
+                break
+            except FileNotFoundError:
+                break
+            except (OSError, ValueError):
+                time.sleep(0.02)
         return out
 
     def run_dir(self, jid: str) -> Path:
@@ -248,7 +257,7 @@ def create_app(mgr: JobManager, api_key: str | None = None) -> Starlette:
             return JSONResponse({"ok": False, "error": e.to_dict()}, status_code=503)
 
     async def jobs_list(request):
-        return JSONResponse([mgr.public(j, 0) for j in sorted(mgr.jobs.values(), key=lambda x: -x["created"])])
+        return JSONResponse([mgr.public(j, 0) for j in sorted(mgr.snapshot(), key=lambda x: -x["created"])])
 
     async def jobs_create(request):
         body = await request.json()

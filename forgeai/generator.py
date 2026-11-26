@@ -60,7 +60,7 @@ def select_tools(req: dict, docs: list[Document], llm: LLM | None) -> dict:
         sysm, user = render(
             "tool_vote",
             requirements={k: req.get(k, "") for k in ("purpose", "scope", "audience", "must_answer_topics")},
-            files=[f"{d.name} ({d.kind})" for d in docs],
+            files=[f"{d.name} ({d.kind})" for d in docs[:25]] + ([f"... and {len(docs) - 25} more files"] if len(docs) > 25 else []),
             tools=tools_desc,
         )
         try:

@@ -50,6 +50,10 @@ class HashingEmbedder:
         return _norm(out)
 
 
+_VEC_CACHE: dict[str, np.ndarray] = {}  # process-wide: rebuilt agents (every eval iteration) never re-embed the same chunk
+_VEC_LOCK = __import__("threading").Lock()
+
+
 class OllamaEmbedder:
     floor = 0.35
 
@@ -75,7 +79,7 @@ class OllamaEmbedder:
             return False
 
     def embed(self, texts: list[str]) -> np.ndarray:
-        missing = [t for t in dict.fromkeys(texts) if self._key(t) not in self._cache]
+        missing = [t for t in dict.fromkeys(texts) if self._key(t) not in _VEC_CACHE and self._key(t) not in self._cache]
         for i in range(0, len(missing), 16):
             batch = missing[i : i + 16]
             try:
@@ -84,15 +88,17 @@ class OllamaEmbedder:
                 vecs = r.json()["embeddings"]
             except Exception as e:  # noqa: BLE001
                 raise ModelUnavailable(f"Embedding model '{self.model}' failed ({type(e).__name__}).", hint=f"Run: ollama pull {self.model}") from e
-            for t, v in zip(batch, vecs):
-                self._cache[self._key(t)] = v
+            with _VEC_LOCK:
+                for t, v in zip(batch, vecs):
+                    _VEC_CACHE[self._key(t)] = np.asarray(v, dtype=np.float32)
         if missing and self.cache_path:
+            self._cache = {k: v.tolist() for k, v in _VEC_CACHE.items()}
             try:
                 self.cache_path.parent.mkdir(parents=True, exist_ok=True)
                 self.cache_path.write_text(json.dumps(self._cache), encoding="utf-8")
             except OSError:
                 pass
-        return _norm(np.array([self._cache[self._key(t)] for t in texts], dtype=np.float32))
+        return _norm(np.array([_VEC_CACHE[self._key(t)] if self._key(t) in _VEC_CACHE else np.asarray(self._cache[self._key(t)], dtype=np.float32) for t in texts], dtype=np.float32))
 
 
 def get_embedder(spec: str | None, host: str = "http://localhost:11434", cache_path: str | Path | None = None):

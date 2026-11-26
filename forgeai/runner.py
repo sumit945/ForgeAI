@@ -24,6 +24,9 @@ def split_question(q: str) -> list[str]:
     return parts if len(parts) >= 2 else [q]
 
 
+MAX_DENSE_CHUNKS = 2500
+
+
 class Agent:
     def __init__(self, defn: dict, llm: LLM, docs: list[Document] | None = None, base_dir: str | Path | None = None, embedder=None):
         self.defn, self.llm = defn, llm
@@ -41,6 +44,9 @@ class Agent:
     def _build_retriever(self, r: dict, embedder=None):
         gl = r.get("glossary") or {}
         if r.get("method") != "hybrid":
+            return Retriever(self.chunks, glossary=gl)
+        if len(self.chunks) > MAX_DENSE_CHUNKS:  # embedding thousands of chunks takes many minutes: degrade, say so, keep working
+            self.retrieval_note = f"corpus too large for dense retrieval ({len(self.chunks)} chunks > {MAX_DENSE_CHUNKS}); using BM25 only"
             return Retriever(self.chunks, glossary=gl)
         try:
             if embedder is None:

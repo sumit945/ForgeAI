@@ -9,3 +9,5 @@ runs/*/iterations/eval_cache.jsonl
 .env
 workspace/
 .claude/
+stress/work/
+stress/results/*/

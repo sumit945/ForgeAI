@@ -13,6 +13,40 @@ MAX_TEXT_CHARS = 3_000_000
 MAX_FILES = 500
 
 
+INJECTION_RE = [re.compile(p, re.I) for p in (
+    r"ignore (?:all |any |the |your )?(?:previous|prior|above|earlier|preceding) (?:instructions?|rules|prompts?)",
+    r"disregard (?:all |any |the |your )?(?:previous|prior|above|earlier) (?:instructions?|rules)",
+    r"\b(?:system|developer|admin) (?:instruction|prompt|message|override)\b\s*:",
+    r"(?:print|reveal|show|output|repeat) (?:your |the )?(?:full |entire |hidden )?(?:system )?(?:prompt|instructions)",
+    r"from now on,? (?:you|answer|reply|respond)",
+    r"you (?:must|should|will) (?:now )?(?:answer|reply|respond) (?:only )?(?:with )?['\"]?[A-Z]{3,}",
+)]
+_SENT = re.compile(r"(?<=[.!?])\s+")
+
+
+def is_injection(sentence: str) -> bool:
+    return any(p.search(sentence) for p in INJECTION_RE)
+
+
+def sanitize_injections(text: str) -> tuple[str, int]:
+    """Remove instruction-like sentences ("ignore all previous instructions...") from document text. Documents are DATA;
+    text that tries to give the assistant orders never reaches the model. Returns (clean_text, number_removed)."""
+    removed = 0
+    out_lines = []
+    for line in text.split(chr(10)):
+        if not is_injection(line):
+            out_lines.append(line)
+            continue
+        kept = []
+        for sent in _SENT.split(line):
+            if is_injection(sent):
+                removed += 1
+            else:
+                kept.append(sent)
+        out_lines.append(" ".join(kept))
+    return chr(10).join(out_lines), removed
+
+
 @dataclass
 class Document:
     name: str
@@ -231,6 +265,16 @@ def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
                     why = "no extractable text (scanned/image-only PDF? OCR is not enabled)" if ext == ".pdf" else "no extractable text"
                     problems.append(f"{p.name}: {why} (skipped)")
                     continue
+            if len(re.findall(r"[^\W\d_]{2,}", text)) < 5:  # needs real words, not just symbols/numbers
+                problems.append(f"{p.name}: no readable text content (symbols or numbers only) (skipped)")
+                continue
+            text, n_inj = sanitize_injections(text)
+            if n_inj:
+                problems.append(f"{p.name}: contains instruction-like text (possible prompt injection); {n_inj} sentence(s) were removed before use")
+                for r in rows:
+                    for k, v in r.items():
+                        if is_injection(v):
+                            r[k] = "[removed]"
             if len(text) > MAX_TEXT_CHARS:
                 text = text[:MAX_TEXT_CHARS]
                 problems.append(f"{p.name}: text truncated to {MAX_TEXT_CHARS:,} characters")
@@ -326,3 +370,33 @@ def inventory(docs: list[Document]) -> list[dict]:
             entry["opening"] = " ".join(d.text.split()[:70])
         inv.append(entry)
     return inv
+
+
+def inventory_for_prompt(docs: list[Document], max_chars: int = 4500) -> list[dict] | dict:
+    """Inventory sized for a small model's context window: full detail for small folders, a statistical summary for big ones
+    (counts by kind, name samples, the most frequent headings, a few evenly spaced openings, and every CSV's columns)."""
+    full = inventory(docs)
+    import json as _json
+    from collections import Counter
+
+    if len(_json.dumps(full, ensure_ascii=False)) <= max_chars:
+        return full
+    kinds = Counter(d.name.rsplit(".", 1)[-1].lower() for d in docs)
+    heads: Counter = Counter()
+    for e in full:
+        for h in e.get("headings", [])[:6]:
+            heads[re.sub(r"\d+", "#", h)] += 1
+    step = max(1, len(docs) // 5)
+    summary = {
+        "note": f"{len(docs)} documents - this is a summary, not a full listing",
+        "documents": len(docs),
+        "total_words": sum(d.words for d in docs),
+        "by_file_type": dict(kinds),
+        "example_names": [d.name for d in docs[:: max(1, len(docs) // 12)]][:12],
+        "common_headings": [h for h, _ in heads.most_common(14)],
+        "sample_openings": [{"name": docs[i].name, "opening": " ".join(docs[i].text.split()[:35])} for i in range(0, len(docs), step)][:5],
+        "tables": [{"name": d.name, "columns": d.columns[:10], "rows": len(d.rows)} for d in docs if d.kind == "csv"][:6],
+    }
+    while len(_json.dumps(summary, ensure_ascii=False)) > max_chars and summary["sample_openings"]:
+        summary["sample_openings"].pop()
+    return summary

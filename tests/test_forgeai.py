@@ -30,6 +30,11 @@ def sentences(t):
 def scripted(task, system, user):
     if task == "intake_questions":
         return json.dumps({"questions": [{"id": f"q{i}", "question": f"Question number {i} about audience?", "why": "w", "default": "d"} for i in range(8)]})
+    if task == "requirements" and "standard operating procedures" in user:
+        return json.dumps({"title": "SOP Helper", "purpose": "Answer questions about standard operating procedures", "scope": "SOP deadlines, retention, limits",
+                           "audience": "staff", "tone": "precise", "language": "English",
+                           "must_answer_topics": ["procedure deadlines in hours", "record retention periods", "spending limits"],
+                           "must_refuse_topics": ["legal advice"], "escalation": "the process owner"})
     if task == "requirements" and "Spares" in user:
         return json.dumps({"title": "Spares Helper", "purpose": "Look up spare parts and supplier terms for superintendents", "scope": "catalogue, suppliers, approvals",
                            "audience": "superintendents", "tone": "precise", "language": "English",
@@ -56,7 +61,7 @@ def scripted(task, system, user):
         passage = user.split("):", 1)[1].split("QUESTIONS ALREADY")[0]
         avoid = user.split("QUESTIONS ALREADY")[1]
         for s in sentences(passage):
-            m = re.search(r"\d[\d,.]*(?: [a-zA-Z%]+)?", s)
+            m = re.search(r"(?<![-\w])\d[\d,.]*(?: [a-zA-Z%]+)?", s)  # a number with its unit; ignore ids such as SOP-001
             if not m:
                 continue
             words = s.split()
