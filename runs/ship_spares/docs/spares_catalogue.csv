@@ -1,0 +1,37 @@
+part_no,description,category,criticality_class,supplier_code,unit_price_usd,lead_time_days,stock_on_hand,min_order_qty
+MP-1001,"Fuel injector, main engine",Engine,A,HLM,412.5,21,6,2
+MP-1002,"Piston ring set, 6-cylinder",Engine,B,NWE,1840.0,35,2,1
+MP-1003,Turbocharger cartridge,Engine,C,NWE,9650.0,56,1,1
+MP-1004,Cylinder liner,Engine,B,NWE,2275.0,42,4,1
+MP-1005,Main bearing shell set,Engine,C,NWE,1320.0,30,3,1
+MP-1006,Fuel oil filter element,Filtration,A,HLM,38.9,10,40,10
+MP-1007,Lube oil filter element,Filtration,A,HLM,54.2,10,36,10
+MP-1008,Air filter cartridge,Filtration,A,HLM,26.75,8,25,5
+MP-1009,Sea water pump impeller,Pumps,B,PVP,186.0,28,5,1
+MP-1010,"Bilge pump complete, 20 m3/h",Pumps,C,PVP,3480.0,45,1,1
+MP-1011,Fresh water pump mechanical seal,Pumps,B,PVP,212.4,25,7,1
+MP-1012,Fuel transfer pump gear set,Pumps,B,PVP,640.0,33,2,1
+MP-1013,"Gasket kit, cylinder head",Engine,A,HLM,148.3,12,18,2
+MP-1014,"O-ring assortment, nitrile",General,A,HLM,42.0,7,60,5
+MP-1015,"Hydraulic hose 1 inch, 5 m",Hydraulics,A,HLM,96.5,9,22,2
+MP-1016,"Hydraulic pump, deck crane",Hydraulics,C,NWE,5890.0,60,1,1
+MP-1017,Hydraulic oil seal kit,Hydraulics,B,HLM,118.0,14,15,3
+MP-1018,Heat exchanger tube bundle,Cooling,C,NWE,7420.0,49,1,1
+MP-1019,"Thermostatic valve, jacket water",Cooling,B,PVP,365.0,27,4,1
+MP-1020,Expansion tank level switch,Electrical,B,HLM,89.9,11,9,1
+MP-1021,"Starter motor, auxiliary engine",Electrical,B,NWE,1295.0,31,2,1
+MP-1022,Alternator voltage regulator,Electrical,B,NWE,478.0,20,3,1
+MP-1023,"Navigation light LED, port",Deck,A,HLM,64.8,6,14,2
+MP-1024,Mooring winch brake band,Deck,B,HLM,930.0,24,2,1
+MP-1025,"Steel wire rope 32 mm, 100 m",Deck,A,HLM,1105.0,18,6,1
+MP-1026,Emergency fire pump impeller,Safety,C,PVP,298.0,26,3,1
+MP-1027,"Lifejacket light, SOLAS",Safety,A,HLM,12.4,5,150,25
+MP-1028,CO2 cylinder hydrostatic test kit,Safety,B,HLM,760.0,35,2,1
+MP-1029,Steering gear hydraulic cylinder seal,Steering,C,NWE,385.0,38,4,1
+MP-1030,Rudder carrier bearing,Steering,C,NWE,4950.0,52,1,1
+MP-1031,Purifier bowl disc stack,Separators,B,NWE,2160.0,40,2,1
+MP-1032,Purifier gasket and seal set,Separators,A,HLM,134.6,13,12,2
+MP-1033,Boiler burner nozzle,Boilers,B,PVP,172.5,29,6,2
+MP-1034,Boiler water gauge glass set,Boilers,A,HLM,58.3,8,20,4
+MP-1035,"Compressor valve plate, starting air",Compressors,B,NWE,524.0,32,3,1
+MP-1036,Compressor piston ring kit,Compressors,B,NWE,318.0,30,4,1

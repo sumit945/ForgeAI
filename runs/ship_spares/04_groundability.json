@@ -1,0 +1,171 @@
+{
+  "status": "ok",
+  "purpose_check": {
+    "topic": "To assist technical superintendents and fleet managers in looking up parts in the spares catalogue, explaining supplier terms, and calculating the total cost of orders, strictly adhering to the approval levels and limits mentioned in the procedure document.",
+    "coverage": 0.62,
+    "top_docs": [
+      "procurement_procedure.pdf",
+      "supplier_terms.pdf"
+    ],
+    "evidence_sentence": null,
+    "llm_verdict": "yes",
+    "quote": "An order must never be split to stay under an approval limit.",
+    "quote_verified": true,
+    "notes": [],
+    "verdict": "supported"
+  },
+  "topics": [
+    {
+      "topic": "Part numbers",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "Every purchase order must record the part number from the catalogue, the supplier code, the unit price in USD and the vessel name.",
+      "llm_verdict": "yes",
+      "quote": "MP-1007; description: Lube oil filter element; category: Filtration; criticality_class: A; supplier_code: HLM; unit_price_usd: 54.2; lead_time_days: 10; stock_on_hand: 36; min_order_qty: 10",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Supplier codes",
+      "coverage": 0.5,
+      "top_docs": [
+        "spares_catalogue.csv",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "A new supplier may be added to this list only after Fleet Procurement completes a quality audit.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"A new supplier may be added to this list only after Fleet Procurement completes a quality audit.\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Part descriptions",
+      "coverage": 1.0,
+      "top_docs": [
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "part_no: MP-1001; description: Fuel injector, main engine; category: Engine; criticality_class: A; supplier_code: HLM; unit_price_usd: 412.5; lead_time_days: 21; stock_on_hand: 6; min_order_qty: 2",
+      "llm_verdict": "yes",
+      "quote": "part_no: MP-1006; description: Fuel oil filter element; category: Filtration; criticality_class: A; supplier_code: HLM; unit_price_usd: 38.9; lead_time_days: 10; stock_on_hand: 40; min_order_qty: 10",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Unit prices",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "Every purchase order must record the part number from the catalogue, the supplier code, the unit price in USD and the vessel name.",
+      "llm_verdict": "yes",
+      "quote": "unit_price_usd: 54.2",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Lead times",
+      "coverage": 0.5,
+      "top_docs": [
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "part_no: MP-1001; description: Fuel injector, main engine; category: Engine; criticality_class: A; supplier_code: HLM; unit_price_usd: 412.5; lead_time_days: 21; stock_on_hand: 6; min_order_qty: 2",
+      "llm_verdict": "yes",
+      "quote": "lead_time_days: 21",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Stock levels",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "If the stock on board falls below the minimum level, the part must be re-ordered at once and no quotation comparison is required.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"If the stock on board falls below the minimum level, the part must be re-ordered at once and no quotation comp\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Minimum order quantities",
+      "coverage": 0.67,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "If the stock on board falls below the minimum level, the part must be re-ordered at once and no quotation comparison is required.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"If the stock on board falls below the minimum level, the part must be re-ordered at once and no quotation comp\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Approval levels",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "If the stock on board falls below the minimum level, the part must be re-ordered at once and no quotation comparison is required.",
+      "llm_verdict": "yes",
+      "quote": "An order must never be split to stay under an approval limit.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Total order costs",
+      "coverage": 0.67,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "Freight is charged at cost, quoted per order.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"Freight is charged at cost, quoted per order.\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Supplier terms",
+      "coverage": 1.0,
+      "top_docs": [
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "SUPPLIER TERMS OF TRADE - APPROVED SPARES SUPPLIERS",
+      "llm_verdict": "yes",
+      "quote": "An order discount of 5 percent applies to orders with a value above 5,000 USD before freight.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    }
+  ],
+  "summary": {
+    "supported": 10,
+    "partial": 0,
+    "unsupported": 0
+  },
+  "known_gaps": [],
+  "message": "All requested topics are supported by the documents."
+}

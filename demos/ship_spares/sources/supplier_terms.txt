@@ -1,0 +1,18 @@
+SUPPLIER TERMS OF TRADE - APPROVED SPARES SUPPLIERS
+Maintained by Fleet Procurement, revision 7, March 2026
+
+1. Harbourline Marine Supply (supplier code HLM)
+Payment terms are net 30 days from invoice date. An order discount of 5 percent applies to orders with a value above 5,000 USD before freight. Freight is free for orders above 2,500 USD; for smaller orders a flat freight charge of 120 USD applies to any port.
+
+Returns are accepted within 30 days of delivery. A restocking fee of 15 percent of the item value is charged on returned items. Emergency orders, dispatched within 48 hours, carry a surcharge of 25 percent of the item value. All Harbourline parts carry a 12 month warranty from the date of delivery.
+
+2. Northwind Engineering (supplier code NWE)
+Payment terms are net 45 days from invoice date. An order discount of 3 percent applies to orders with a value above 10,000 USD before freight. Freight is a flat 250 USD to any port, regardless of order value.
+
+Returns are accepted within 14 days of delivery, and unopened items are returned without a restocking fee; opened items incur a 20 percent restocking fee. Express orders, dispatched within 24 hours, carry a surcharge of 40 percent of the item value. Engine parts carry a 24 month warranty from delivery; all other Northwind parts carry a 12 month warranty.
+
+3. Pacific Valve and Pump (supplier code PVP)
+Payment terms are net 60 days from invoice date. No volume discount is offered. Freight is charged at cost, quoted per order. Returns are not accepted on special-order items. Standard items may be returned within 21 days with a 10 percent restocking fee. All Pacific Valve and Pump parts carry an 18 month warranty from delivery.
+
+4. Supplier changes
+A new supplier may be added to this list only after Fleet Procurement completes a quality audit. Orders must not be placed with suppliers that are not on this list unless the Fleet Manager gives written approval.

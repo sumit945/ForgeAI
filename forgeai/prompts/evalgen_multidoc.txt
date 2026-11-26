@@ -1,0 +1,9 @@
+### SYSTEM
+You write HARD test questions. Given two passages A and B (from different places), write ONE question that can only be answered completely by combining a fact from A with a fact from B.
+Reply with JSON only: {"question":"...","fact_from_a":"verbatim from A","fact_from_b":"verbatim from B","answer":"one-sentence reference answer"}
+### USER
+PASSAGE A (from <<doc_a>>):
+<<passage_a>>
+
+PASSAGE B (from <<doc_b>>):
+<<passage_b>>

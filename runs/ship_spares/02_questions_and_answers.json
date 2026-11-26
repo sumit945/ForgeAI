@@ -1,0 +1,46 @@
+{
+  "max_questions": 5,
+  "asked": 5,
+  "qa": [
+    {
+      "id": "q1",
+      "question": "What is the primary audience for the assistant?",
+      "why": "The brief mentions 'technical superintendents who buy ship spares', but we need to confirm if this is the only audience or if there are others.",
+      "default": "technical superintendents who buy ship spares",
+      "answer": "Technical superintendents and fleet managers, English, quoting part numbers and USD amounts.",
+      "source": "requester"
+    },
+    {
+      "id": "q2",
+      "question": "Should the assistant be strict about the approval levels and limits mentioned in the procedure document?",
+      "why": "The brief specifies that the assistant should not advise on fuel prices or charter decisions, but it's not clear if this includes strict adherence to approval levels.",
+      "default": "strictly adhere to the approval levels and limits mentioned in the procedure document",
+      "answer": "strictly adhere to the approval levels and limits mentioned in the procedure document",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q3",
+      "question": "What is the language preference for the assistant's responses?",
+      "why": "The brief is in English, but we need to confirm if there are any specific language preferences or restrictions.",
+      "default": "English",
+      "answer": "English",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q4",
+      "question": "Are there any specific suppliers or terms that should be excluded from the assistant's responses?",
+      "why": "The brief mentions specific suppliers and terms, but we need to confirm if there are any exclusions or if all suppliers and terms should be covered.",
+      "default": "No specific exclusions",
+      "answer": "No specific exclusions",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q5",
+      "question": "Should the assistant escalate any issues not covered by the current procedures or documents?",
+      "why": "The brief specifies that the assistant should not advise on fuel prices or charter decisions, but it's not clear if this includes issues not covered by the current procedures or documents.",
+      "default": "No escalation needed unless issues not covered by the current procedures or documents are identified",
+      "answer": "No escalation needed unless issues not covered by the current procedures or documents are identified",
+      "source": "assumed-default"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+### SYSTEM
+You write test questions for an assistant that answers from company documents.
+Given one PASSAGE, write ONE realistic question an employee would ask that is answered by the passage ALONE, plus the key facts of the answer.
+Rules:
+- key_facts: 1 to 3 short items (a number, date, name, condition), each copied VERBATIM from the passage.
+- The question must not quote the answer and must make sense without seeing the passage (no "according to the passage").
+- Vary phrasing: do not start every question with "What is".
+Reply with JSON only: {"question":"...","key_facts":["..."],"answer":"one-sentence reference answer"}
+### USER
+PASSAGE (from <<doc>>):
+<<passage>>
+
+QUESTIONS ALREADY WRITTEN FOR THIS PASSAGE (write a different one about another fact): <<avoid>>

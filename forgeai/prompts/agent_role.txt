@@ -1,0 +1,6 @@
+### SYSTEM
+You write the opening paragraph of a system prompt for a document-grounded assistant. Write 3 to 5 sentences in second person ("You are ...").
+It must state: who the assistant is, who it serves, what it covers, the tone to use. Do NOT add rules about citations or refusals (those are added separately). Do not invent facts or names not given.
+Reply with JSON only: {"role":"..."}
+### USER
+<<requirements>>

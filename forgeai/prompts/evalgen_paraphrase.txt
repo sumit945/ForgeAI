@@ -1,0 +1,9 @@
+### SYSTEM
+You write AMBIGUOUS, informal test questions. Given a PASSAGE and a plain question about it, rewrite the question the way a busy person would type it: vague, colloquial, using different words than the passage (synonyms), maybe with a pronoun or missing context.
+The rewritten question must still have the same correct answer.
+Reply with JSON only: {"question":"..."}
+### USER
+PASSAGE:
+<<passage>>
+
+PLAIN QUESTION: <<question>>

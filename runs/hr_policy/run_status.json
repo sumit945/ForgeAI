@@ -1,0 +1,55 @@
+{
+  "status": "succeeded_with_warnings",
+  "pipeline_version": "2",
+  "stages": [
+    {
+      "name": "intake",
+      "status": "ok",
+      "seconds": 19.3
+    },
+    {
+      "name": "groundability",
+      "status": "ok",
+      "seconds": 30.4
+    },
+    {
+      "name": "generate",
+      "status": "ok",
+      "seconds": 6.3
+    },
+    {
+      "name": "evalset",
+      "status": "ok",
+      "seconds": 374.2
+    },
+    {
+      "name": "calibration",
+      "status": "ok",
+      "seconds": 45.8
+    },
+    {
+      "name": "optimize",
+      "status": "ok",
+      "seconds": 168.0
+    }
+  ],
+  "warnings": [
+    "groundability: Some requested topics are weakly or not supported. Unsupported topics were removed from scope and will be refused, not guessed.",
+    "the model left `sources` empty in 52% of answers; citations were attributed by code"
+  ],
+  "errors": [],
+  "elapsed_seconds": 648.1,
+  "budget": {
+    "calls": 147,
+    "seconds": 648.4,
+    "prompt_tokens": 75133,
+    "completion_tokens": 10336,
+    "retries": 0,
+    "failed_calls": 0,
+    "fallbacks_used": 0,
+    "truncated_prompts": 0,
+    "wall_clock_minutes": 10.8,
+    "agent_model": "qwen2.5:3b-instruct",
+    "judge_model": "qwen2.5:3b-instruct"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "max_questions": 5,
+  "asked": 2,
+  "qa": [
+    {
+      "id": "q1",
+      "question": "What specific HR policies and procedures should the assistant cover regarding health insurance and pension contributions?",
+      "why": "The brief mentions that the assistant should explain health insurance and pension contributions, but does not specify which policies or procedures should be covered.",
+      "default": "The assistant should cover the general policies and procedures related to health insurance and pension contributions as outlined in the HR policies and procedures documents available.",
+      "answer": "Shore-based office and operations staff of all grades, not seafarers.",
+      "source": "requester"
+    },
+    {
+      "id": "q2",
+      "question": "What is the current status of the health insurance and pension contribution policies for shore staff?",
+      "why": "The brief mentions that the assistant should provide real numbers and deadlines, but does not specify what specific policies should be covered.",
+      "default": "The assistant should provide the current status of the health insurance and pension contribution policies for shore staff as outlined in the available documents.",
+      "answer": "Friendly but precise; short answers with the exact numbers.",
+      "source": "requester"
+    }
+  ]
+}

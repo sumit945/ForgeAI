@@ -1,0 +1,97 @@
+{
+  "ran": true,
+  "judge_model": "qwen2.5:3b-instruct",
+  "checks": [
+    {
+      "case": "ans-01",
+      "kind": "gold",
+      "expected_all_stated": true,
+      "judge_all_stated": true,
+      "ok": true
+    },
+    {
+      "case": "ans-01",
+      "kind": "wrong_answer",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-01",
+      "kind": "padded_wrong",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-01",
+      "kind": "altered_number",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-02",
+      "kind": "gold",
+      "expected_all_stated": true,
+      "judge_all_stated": true,
+      "ok": true
+    },
+    {
+      "case": "ans-02",
+      "kind": "wrong_answer",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-02",
+      "kind": "padded_wrong",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-02",
+      "kind": "altered_number",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-03",
+      "kind": "gold",
+      "expected_all_stated": true,
+      "judge_all_stated": false,
+      "ok": false
+    },
+    {
+      "case": "ans-03",
+      "kind": "wrong_answer",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-03",
+      "kind": "padded_wrong",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    },
+    {
+      "case": "ans-03",
+      "kind": "altered_number",
+      "expected_all_stated": false,
+      "judge_all_stated": false,
+      "ok": true
+    }
+  ],
+  "reliability": 0.92,
+  "by_kind": {
+    "gold": "2/3",
+    "wrong_answer": "3/3",
+    "padded_wrong": "3/3",
+    "altered_number": "3/3"
+  }
+}

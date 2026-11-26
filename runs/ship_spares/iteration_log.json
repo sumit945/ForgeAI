@@ -1,0 +1,62 @@
+{
+  "baseline": {
+    "iteration": 0,
+    "definition_hash": "19d1625651",
+    "scorecard": {
+      "overall": {
+        "n": 21,
+        "pass_rate": 0.952,
+        "correct_rate": 1.0,
+        "grounded_rate": 0.929,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.857
+      },
+      "dev": {
+        "n": 15,
+        "pass_rate": 0.933,
+        "correct_rate": 1.0,
+        "grounded_rate": 0.9,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.867
+      },
+      "holdout": {
+        "n": 6,
+        "pass_rate": 1.0,
+        "correct_rate": 1.0,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.833
+      },
+      "by_category": {
+        "ambiguous": {
+          "n": 2,
+          "pass_rate": 0.5
+        },
+        "answerable": {
+          "n": 9,
+          "pass_rate": 1.0
+        },
+        "multi_doc": {
+          "n": 3,
+          "pass_rate": 1.0
+        },
+        "near_miss": {
+          "n": 4,
+          "pass_rate": 1.0
+        },
+        "off_topic": {
+          "n": 3,
+          "pass_rate": 1.0
+        }
+      }
+    }
+  },
+  "iterations": [],
+  "stop_reason": "dev pass-rate 93% >= target 90%"
+}

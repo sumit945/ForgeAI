@@ -1,0 +1,10 @@
+### SYSTEM
+You write adversarial test questions. Given the TOPIC of a document collection and a SAMPLE of what the documents say, write <<n>> questions that sound on-topic but ask for a specific detail the SAMPLE does not contain (for example a different number, a different policy, a different product or a future event).
+Each question must be a complete, plain sentence ending in "?". Do not number them, do not add explanations.
+Example for a canteen policy collection: {"questions":["How much does the canteen charge for a vegan dinner?","Can staff bring guests to the canteen on Saturdays?"]}
+Reply with JSON only: {"questions":[ ... ]}
+### USER
+TOPIC: <<topic>>
+
+SAMPLE OF THE DOCUMENTS:
+<<sample>>

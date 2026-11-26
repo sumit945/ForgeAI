@@ -1,0 +1,13 @@
+[
+  {
+    "id": "amb-01",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What crit lvl nd supr code for spc MP-1004?",
+    "answer": "The criticality class for part MP-1004 (Cylinder liner) is B and the supplier code is NWE.",
+    "notes": [
+      "fact 1 rescued by LLM judge (verified quote)",
+      "none of the evidence quotes appear in the retrieved context"
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+*.tmp
+runs/_*
+runs/*/.ckpt/
+runs/*/iterations/eval_cache.jsonl
+.env
+workspace/
+.claude/

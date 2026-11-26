@@ -1,0 +1,160 @@
+{
+  "status": "warn",
+  "purpose_check": {
+    "topic": "To provide clear and concise answers to HR policy questions for Meridian Maritime shore staff, covering specific policies and procedures related to health insurance, pension contributions, conduct, grievance, and business travel expenses.",
+    "coverage": 0.39,
+    "top_docs": [
+      "conduct_grievance_and_travel.pdf",
+      "leave_policy.pdf",
+      "working_hours_and_overtime.pdf"
+    ],
+    "evidence_sentence": null,
+    "llm_verdict": "yes",
+    "quote": "Any conflict of interest must be disclosed to the line manager within 14 days of the employee becoming aware of it.",
+    "quote_verified": true,
+    "notes": [],
+    "verdict": "partial"
+  },
+  "topics": [
+    {
+      "topic": "annual leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Full-time shore staff are entitled to 24 working days of paid annual leave per calendar year.",
+      "llm_verdict": "yes",
+      "quote": "Employees in their probation period (the first 6 months of employment) accrue leave normally but may take no more than 5 days of leave during probation.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "sick leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Employees receive 12 paid sick days per calendar year.",
+      "llm_verdict": "yes",
+      "quote": "Employees in their probation period (the first 6 months of employment) accrue leave normally but may take no more than 5 days of leave during probation.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "parental leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Birth mothers receive 26 weeks of maternity leave on full pay.",
+      "llm_verdict": "yes",
+      "quote": "Fathers and partners receive 4 weeks of paternity leave on full pay, which must be taken within 6 months of the birth.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "conduct",
+      "coverage": 1.0,
+      "top_docs": [
+        "conduct_grievance_and_travel.pdf"
+      ],
+      "evidence_sentence": null,
+      "llm_verdict": "partial",
+      "quote": "Step 1: the employee should first try to resolve the matter informally with their line manager within 10 working days of the incident.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "partial"
+    },
+    {
+      "topic": "grievance",
+      "coverage": 1.0,
+      "top_docs": [
+        "conduct_grievance_and_travel.pdf"
+      ],
+      "evidence_sentence": null,
+      "llm_verdict": "yes",
+      "quote": "Step 1: the employee should first try to resolve the matter informally with their line manager within 10 working days of the incident.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "business travel expenses",
+      "coverage": 0.67,
+      "top_docs": [
+        "conduct_grievance_and_travel.pdf"
+      ],
+      "evidence_sentence": null,
+      "llm_verdict": "yes",
+      "quote": "Retaliation against someone who reports in good faith is a disciplinary offence.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "health insurance",
+      "coverage": 0.0,
+      "top_docs": [],
+      "evidence_sentence": null,
+      "llm_verdict": null,
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "no document text overlaps this topic"
+      ],
+      "verdict": "unsupported"
+    },
+    {
+      "topic": "pension contributions",
+      "coverage": 0.0,
+      "top_docs": [],
+      "evidence_sentence": null,
+      "llm_verdict": null,
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "no document text overlaps this topic"
+      ],
+      "verdict": "unsupported"
+    },
+    {
+      "topic": "working hours",
+      "coverage": 1.0,
+      "top_docs": [
+        "working_hours_and_overtime.pdf"
+      ],
+      "evidence_sentence": "No employee may work more than 10 hours of overtime in a single week.",
+      "llm_verdict": "yes",
+      "quote": "Overtime must be approved in advance by the line manager. Unapproved overtime is not paid.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "overtime",
+      "coverage": 1.0,
+      "top_docs": [
+        "working_hours_and_overtime.pdf"
+      ],
+      "evidence_sentence": "Overtime must be approved in advance by the line manager.",
+      "llm_verdict": "yes",
+      "quote": "Overtime must be approved in advance by the line manager. Unapproved overtime is not paid.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    }
+  ],
+  "summary": {
+    "supported": 7,
+    "partial": 1,
+    "unsupported": 2
+  },
+  "known_gaps": [
+    "health insurance",
+    "pension contributions"
+  ],
+  "message": "Some requested topics are weakly or not supported. Unsupported topics were removed from scope and will be refused, not guessed."
+}

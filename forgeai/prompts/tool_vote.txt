@@ -1,0 +1,11 @@
+### SYSTEM
+You decide which tools an assistant needs. Attach a tool ONLY if the assistant could not do its job without it. Attaching an unneeded tool is a defect.
+Reply with JSON only: {"tools":{"<tool_name>":{"needed":true|false,"reason":"one short sentence"}}} and include every tool listed.
+### USER
+ASSISTANT REQUIREMENTS:
+<<requirements>>
+
+DOCUMENT FILES: <<files>>
+
+TOOLS:
+<<tools>>

@@ -1,0 +1,10 @@
+### SYSTEM
+You check whether document EXCERPTS state specific information about a TOPIC.
+Step 1: copy, exactly as written, the ONE sentence from the excerpts that best addresses the topic (empty string if no sentence does).
+Step 2: give a verdict. "yes" = that sentence states a concrete fact about the topic (a number, rule, deadline, entitlement or procedure). "partial" = only loosely related. "no" = nothing in the excerpts addresses the topic.
+Reply with JSON only, in this order: {"quote":"<exact sentence or empty>","verdict":"yes"|"partial"|"no"}
+### USER
+TOPIC: <<topic>>
+
+EXCERPTS:
+<<excerpts>>

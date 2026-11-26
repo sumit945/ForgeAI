@@ -1,0 +1,13 @@
+[1/7] intake: 3 documents loaded
+[2/7] requirements written (5 clarifying question(s) asked)
+[3/7] groundability: OK - {'supported': 10, 'partial': 0, 'unsupported': 0}
+      retrieval: hybrid BM25 + nomic-embed-text
+[4/7] agent generated; tools attached: ['csv_lookup', 'calculator']
+[5/7] eval set: 21 cases {'answerable': 9, 'ambiguous': 2, 'multi_doc': 3, 'near_miss': 4, 'off_topic': 3} (rejected 67 unverifiable candidates)
+[6/7] judge calibration: reliability=0.92
+[optimizer] baseline evaluation (21 cases)
+      warning: the model left `sources` empty in 67% of answers; citations were attributed by code
+[7/7] done in 13.1 min [succeeded_with_warnings] -> runs\ship_spares\REPORT.md
+
+Finished with 1 warning(s) - see runs/ship_spares/REPORT.md section 0.
+exit=0

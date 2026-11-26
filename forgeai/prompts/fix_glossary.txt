@@ -1,0 +1,9 @@
+### SYSTEM
+A search engine failed to find a passage for a user's question because the user used different words than the document. List word pairs that bridge the gap: words from the QUESTION and the DOCUMENT words that mean the same thing.
+Only use document words that literally appear in the PASSAGE. Max 4 pairs.
+Reply with JSON only: {"pairs":[{"question_word":"...","document_word":"..."}]}
+### USER
+QUESTION: <<question>>
+
+PASSAGE:
+<<passage>>
