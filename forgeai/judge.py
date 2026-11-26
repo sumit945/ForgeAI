@@ -19,6 +19,7 @@ from .errors import BudgetExceeded, ModelUnavailable
 from .i18n import refusal_heads
 from .lang import normalize_text
 from .llm import LLM
+from .parallel import pmap
 from .prompts import render
 from .schemas import JudgeOut
 from .retrieval import tokenize
@@ -187,8 +188,10 @@ def calibrate(cases: list[dict], llm: LLM | None) -> dict:
         " Overall, this is a well-established and widely understood part of standard practice, and it is important to remember"
         " that careful, consistent application of the relevant guidance supports good outcomes for everyone involved in the process."
     ) * 2
-    checks = []
-    for i, c in enumerate(ans_cases):
+
+    def probe(ic: tuple[int, dict]) -> list[dict]:
+        i, c = ic
+        checks: list[dict] = []
         other = ans_cases[(i + 1) % len(ans_cases)]
         gold = c.get("reference_answer") or "; ".join(c["expected_facts"])
         if not all(contains(gold, f) for f in c["expected_facts"]):
@@ -208,6 +211,9 @@ def calibrate(cases: list[dict], llm: LLM | None) -> dict:
             a = llm_check(c, res, llm)
             b = llm_check(c, res, llm, facts=list(reversed(c["expected_facts"])))
             checks.append({"case": c["id"], "kind": "order_swap_consistency", "ok": a["ok"] and b["ok"] and sum(a["facts"]) == sum(b["facts"])})
+        return checks
+
+    checks = [x for part in pmap(probe, list(enumerate(ans_cases))) for x in part]
     n_ok = sum(1 for c in checks if c["ok"])
     by_kind: dict[str, list[bool]] = {}
     for c in checks:

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -151,6 +152,7 @@ class LLM:
         self.fallback_models = list(fallback_models or [])
         self.breaker_threshold = breaker_threshold
         self._consecutive_failures = 0
+        self._lock = threading.Lock()  # counters and the trace file are shared by parallel calls
 
     # -- tracing ---------------------------------------------------------------------
     def _trace(self, rec: dict) -> None:
@@ -158,7 +160,7 @@ class LLM:
             return
         try:
             self.trace_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.trace_path, "a", encoding="utf-8") as f:
+            with self._lock, open(self.trace_path, "a", encoding="utf-8") as f:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
         except OSError:
             pass  # tracing must never break a run
@@ -196,7 +198,8 @@ class LLM:
         if total <= budget:
             return messages
         msgs = [dict(m) for m in messages]
-        self.budget.truncated_prompts += 1
+        with self._lock:
+            self.budget.truncated_prompts += 1
         while total > budget:
             i = max(range(len(msgs)), key=lambda k: len(msgs[k]["content"]))
             c = msgs[i]["content"]
@@ -258,22 +261,26 @@ class LLM:
                     out, pt, ct = self._call(model, msgs, json_mode, temp, max_tokens)
                 except _Transient as e:
                     last_err = str(e)
-                    self.budget.retries += 1
+                    with self._lock:
+                        self.budget.retries += 1
                     if attempt < self.retries:
                         time.sleep(self.backoff * (2**attempt))
                     continue
-                self._consecutive_failures = 0
-                if mi > 0:
-                    self.budget.fallbacks_used += 1
-                self.budget.prompt_tokens += pt
-                self.budget.completion_tokens += ct
-                self.budget.calls += 1
+                with self._lock:
+                    self._consecutive_failures = 0
+                    if mi > 0:
+                        self.budget.fallbacks_used += 1
+                    self.budget.prompt_tokens += pt
+                    self.budget.completion_tokens += ct
+                    self.budget.calls += 1
                 self._trace({"task": task, "model": model, "seconds": round(time.time() - t0, 2), "messages": msgs, "response": out})
                 return out
-        self.budget.failed_calls += 1
-        self._consecutive_failures += 1
+        with self._lock:
+            self.budget.failed_calls += 1
+            self._consecutive_failures += 1
+            tripped = self._consecutive_failures >= self.breaker_threshold
         self._trace({"task": task, "model": self.model, "error": last_err})
-        if self._consecutive_failures >= self.breaker_threshold:
+        if tripped:
             raise ModelUnavailable(f"Circuit breaker open: {self._consecutive_failures} consecutive model failures (last: {last_err}).")
         raise ModelOutputError(f"{task}: model call failed after retries ({last_err}).")
 

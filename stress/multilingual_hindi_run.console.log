@@ -1,0 +1,17 @@
+[1/7] intake: 3 documents loaded
+[2/7] requirements written (0 clarifying question(s) asked)
+[3/7] groundability: OK - {'supported': 10, 'partial': 0, 'unsupported': 0, 'ignored_not_in_brief': 0}
+      retrieval: hybrid BM25 + bge-m3
+[4/7] agent generated; tools attached: none
+      warning: eval set: only 18 verified cases could be generated (target >= 20): the documents are small or the model's candidates failed verification
+[5/7] eval set: 18 cases {'answerable': 8, 'multi_doc': 3, 'near_miss': 3, 'off_topic': 4} (rejected 104 unverifiable candidates)
+[6/7] judge calibration: reliability=0.82
+[optimizer] baseline evaluation (18 cases)
+[optimizer] iteration 1: dev pass 77%; failures {'prompt_defect': 2, 'hallucination': 1}
+[optimizer]   REVERTED: dev pass-rate 77% -> 69% (no strict improvement)
+[optimizer]   ablation 'prompt_defect' alone: dev 77% -> 69%
+[optimizer]   ablation 'hallucination' alone: dev 77% -> 69%
+[optimizer] iteration 2: dev pass 77%; failures {'prompt_defect': 2, 'hallucination': 1}
+[7/7] done in 37.8 min [succeeded_with_warnings] -> C:\Users\Admin\Desktop\MARI APP Project\stress\results\multilingual\hindi_hr_run\REPORT.md
+hindi: QA 9/10 right_script 10 gap=False off=True inj=True
+exit=0

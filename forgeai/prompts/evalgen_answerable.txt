@@ -4,6 +4,7 @@ Given one PASSAGE, write ONE realistic question an employee would ask that is an
 Rules:
 - key_facts: 1 to 3 short items (a number, date, name, condition), each copied VERBATIM from the passage.
 - The question must not quote the answer and must make sense without seeing the passage (no "according to the passage").
+- answer: one sentence that contains EVERY key_fact exactly as written in key_facts (same words, same numbers).
 - Vary phrasing: do not start every question with "What is".
 Reply with JSON only: {"question":"...","key_facts":["..."],"answer":"one-sentence reference answer"}
 Write the question and the reference answer in <<language>>. Keep the JSON keys in English; copy key_facts exactly as they appear in the passage.

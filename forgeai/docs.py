@@ -7,7 +7,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-SUPPORTED = {".pdf", ".txt", ".md", ".csv", ".docx", ".xlsx", ".html", ".htm"}
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp"}  # read with OCR
+SUPPORTED = {".pdf", ".txt", ".md", ".csv", ".docx", ".xlsx", ".html", ".htm"} | IMAGE_EXTS
 MAX_FILE_BYTES = 50 * 1024 * 1024
 MAX_TEXT_CHARS = 3_000_000
 MAX_FILES = 500
@@ -66,6 +67,7 @@ class Document:
     text: str
     columns: list[str] = field(default_factory=list)
     rows: list[dict] = field(default_factory=list)
+    ocr: dict | None = None  # {pages, conf, low, dropped} when any part of this document was read by OCR
 
     @property
     def words(self) -> int:
@@ -90,7 +92,16 @@ def _read_text_file(p: Path) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
-def _read_pdf(p: Path) -> tuple[str, list[str]]:
+def _page_has_image(pg) -> bool:
+    """Does this PDF page contain an image XObject? (A scanned page does; a text page that merely ends early does not.)"""
+    try:
+        xo = pg["/Resources"]["/XObject"].get_object()
+        return any(xo[k].get_object().get("/Subtype") == "/Image" for k in xo)
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _read_pdf(p: Path) -> tuple[str, list[str], list[str], set[int]]:
     from pypdf import PdfReader
 
     notes: list[str] = []
@@ -103,15 +114,18 @@ def _read_pdf(p: Path) -> tuple[str, list[str]]:
         if not ok:
             raise ValueError("PDF is password-protected")
         notes.append("encrypted PDF opened with an empty password")
-    pages, bad = [], 0
-    for pg in r.pages:
+    pages, bad, img_pages = [], 0, set()
+    for idx, pg in enumerate(r.pages):
         try:
             pages.append(pg.extract_text() or "")
         except Exception:  # noqa: BLE001
             bad += 1
+            pages.append("")
+        if len(pages[-1].strip()) < 25 and _page_has_image(pg):
+            img_pages.add(idx)
     if bad:
         notes.append(f"{bad} page(s) could not be read")
-    return "\n\n".join(pages), notes
+    return "\n\n".join(pages), notes, pages, img_pages
 
 
 def _read_docx(p: Path) -> str:
@@ -166,7 +180,11 @@ def _read_xlsx(p: Path) -> tuple[list[str], list[dict]]:
     return cols, rows
 
 
+_LIGATURES = {0xFB00: "ff", 0xFB01: "fi", 0xFB02: "fl", 0xFB03: "ffi", 0xFB04: "ffl", 0xFB05: "st", 0xFB06: "st"}  # PDF typesetters emit these as single characters
+
+
 def clean_text(t: str) -> str:
+    t = t.translate(_LIGATURES)  # "offiﬁce" would otherwise never match a search for "office"
     t = t.replace("\r\n", "\n").replace("\r", "\n").replace(" ", " ")
     t = re.sub(r"[ \t]+", " ", t)
     t = re.sub(r"(?<=[a-z,;])\n(?=[a-z])", " ", t)  # re-join hard-wrapped lines
@@ -210,7 +228,47 @@ def reflow(text: str) -> str:
     return "\n\n".join(paras)
 
 
-def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
+def _apply_ocr(path: Path, pages: list[str], todo: list[int], langs: list[str], budget) -> tuple[list[str], dict | None, list[str]]:
+    """OCR the pages of a PDF that have no text layer. Returns (pages, meta, messages). Never raises: any failure becomes a message."""
+    from . import ocr as ocr_mod
+
+    st = ocr_mod.status(langs)
+    msgs: list[str] = []
+    if not st["available"] and langs == ["en"] and st.get("models", {}).get("hi") and st.get("detector"):
+        st = {"available": True}  # English-only model missing: the Devanagari model also reads Latin text (lower accuracy)
+        msgs.append("English OCR uses the multilingual Devanagari model (lower accuracy); for better results run: python -m forgeai ocr-setup --langs en")
+        langs = ["hi", "en"]
+    if not st["available"]:
+        return pages, None, [f"{len(todo)} of {len(pages)} page(s) have no text layer and OCR is not available: {st['reason']}"]
+    try:
+        res = ocr_mod.ocr_pdf_pages(path, todo, ocr_mod.reader_langs(langs), budget)
+    except Exception as e:  # noqa: BLE001
+        return pages, None, msgs + [f"OCR failed ({type(e).__name__}: {str(e)[:100]}); {len(todo)} page(s) not read"]
+    out, used, low, dropped = list(pages), [], [], []
+    for i, r in res.items():
+        if r["conf"] < ocr_mod.DROP_BELOW or not r["text"].strip():
+            dropped.append(i + 1)
+        else:
+            out[i] = r["text"]
+            used.append(r["conf"])
+            if r["conf"] < ocr_mod.WARN_BELOW:
+                low.append(i + 1)
+    unread = [i + 1 for i in todo if i not in res]
+    meta = None
+    if used:
+        mean = sum(used) / len(used)
+        meta = {"pages": len(used), "conf": round(mean, 2), "low": low, "dropped": dropped}
+        msgs.append(f"read {len(used)} scanned page(s) with OCR (mean confidence {mean:.0%})")
+    if low:
+        msgs.append(f"low OCR confidence on page(s) {low}: the text may contain recognition errors")
+    if dropped:
+        msgs.append(f"page(s) {dropped} were not used: OCR confidence below {ocr_mod.DROP_BELOW:.0%} (unreadable scan)")
+    if unread:
+        msgs.append(f"OCR page/time limit reached: page(s) {unread[:8]}{'...' if len(unread) > 8 else ''} were not read")
+    return out, meta, msgs
+
+
+def load_folder(folder: str | Path, ocr: str = "auto", ocr_langs: list[str] | None = None) -> tuple[list[Document], list[str]]:
     """Load every readable document. Never raises for a bad FILE: it is skipped and reported in `problems`.
     Raises InputError only when the folder itself is unusable."""
     import hashlib
@@ -220,9 +278,13 @@ def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
     folder = Path(folder)
     if not folder.exists() or not folder.is_dir():
         raise InputError(f"Document folder not found: {folder}")
+    from . import ocr as ocr_mod
+
     docs: list[Document] = []
     problems: list[str] = []
     seen: dict[str, str] = {}
+    ocr_langs = [c for c in (ocr_langs or ["en"]) if c]
+    budget = ocr_mod.Budget()
     files = [p for p in sorted(folder.rglob("*")) if p.is_file()]
     for p in files:
         if p.suffix.lower() not in SUPPORTED and not p.name.startswith("."):
@@ -233,6 +295,7 @@ def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
         candidates = candidates[:MAX_FILES]
     for p in candidates:
         ext = p.suffix.lower()
+        ocr_meta = None
         try:
             size = p.stat().st_size
             if size == 0:
@@ -262,9 +325,37 @@ def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
             else:
                 kind = "text"
                 if ext == ".pdf":
-                    raw_text, notes = _read_pdf(p)
+                    raw_text, notes, pages, img_pages = _read_pdf(p)
                     problems += [f"{p.name}: {n}" for n in notes]
+                    # OCR only pages that have no text layer AND hold an image (a text page that ends early is not a scan)
+                    todo = list(range(len(pages))) if ocr == "force" else sorted(img_pages)
+                    if todo and ocr == "detect":  # preview only: say what will happen at build time, never run the slow OCR here
+                        problems.append(f"{p.name}: {len(todo)} scanned page(s) detected; they will be read with OCR when the agent is built")
+                    elif todo and ocr != "off":
+                        pages, ocr_meta, msgs = _apply_ocr(p, pages, todo, ocr_langs, budget)
+                        problems += [f"{p.name}: {m}" for m in msgs]
+                        raw_text = "\n\n".join(pages)
+                    elif todo and len(todo) == len(pages):
+                        problems.append(f"{p.name}: no text layer (scanned?) and OCR is switched off")
                     text = reflow(raw_text)
+                elif ext in IMAGE_EXTS:
+                    if ocr == "detect":
+                        problems.append(f"{p.name}: image file; it will be read with OCR when the agent is built (skipped in preview)")
+                        continue
+                    st = ocr_mod.status(ocr_langs) if ocr != "off" else {"available": False, "reason": "OCR is switched off"}
+                    if not st["available"]:
+                        problems.append(f"{p.name}: image file cannot be read: {st['reason']} (skipped)")
+                        continue
+                    r = ocr_mod.ocr_image_file(p, ocr_mod.reader_langs(ocr_langs), budget)
+                    if r is None:
+                        problems.append(f"{p.name}: OCR page/time limit reached (skipped)")
+                        continue
+                    if r["conf"] < ocr_mod.DROP_BELOW:
+                        problems.append(f"{p.name}: OCR confidence {r['conf']:.0%} is below {ocr_mod.DROP_BELOW:.0%}: unreadable image (skipped)")
+                        continue
+                    ocr_meta = {"pages": 1, "conf": round(r["conf"], 2), "low": [1] if r["conf"] < ocr_mod.WARN_BELOW else [], "dropped": []}
+                    problems.append(f"{p.name}: read with OCR (confidence {r['conf']:.0%})" + (" - low confidence: the text may contain recognition errors" if ocr_meta["low"] else ""))
+                    text = r["text"]
                 elif ext == ".docx":
                     text = _read_docx(p)
                 elif ext in (".html", ".htm"):
@@ -273,7 +364,7 @@ def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
                     text = _read_text_file(p)
                 text = clean_text(text)
                 if len(text.split()) < 5:
-                    why = "no extractable text (scanned/image-only PDF? OCR is not enabled)" if ext == ".pdf" else "no extractable text"
+                    why = "no extractable text" + (" even after OCR" if ocr_meta is None and ocr != "off" and ext == ".pdf" else "")  # the OCR messages above explain why
                     problems.append(f"{p.name}: {why} (skipped)")
                     continue
             if len(re.findall(r"[^\W\d_]{2,}", text)) < 5:  # needs real words, not just symbols/numbers
@@ -297,7 +388,7 @@ def load_folder(folder: str | Path) -> tuple[list[Document], list[str]]:
             name = p.name
             if any(d.name == name for d in docs):  # same file name in two sub-folders
                 name = f"{p.parent.name}__{p.name}"
-            docs.append(Document(name, str(p), kind, text, cols, rows))
+            docs.append(Document(name, str(p), kind, text, cols, rows, ocr_meta))
         except Exception as e:  # noqa: BLE001
             problems.append(f"{p.name}: could not be read ({type(e).__name__}: {str(e)[:120]}) (skipped)")
     return docs, problems

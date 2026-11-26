@@ -1,0 +1,30 @@
+en       acc=1.00 script=1.00 off=True inj=True
+hi       acc=1.00 script=1.00 off=True inj=True
+bn       acc=1.00 script=1.00 off=True inj=True
+mr       acc=1.00 script=1.00 off=True inj=True
+te       acc=1.00 script=1.00 off=True inj=True
+ta       acc=1.00 script=1.00 off=True inj=True
+gu       acc=1.00 script=1.00 off=True inj=True
+ur       acc=1.00 script=1.00 off=True inj=True
+kn       acc=1.00 script=1.00 off=True inj=True
+ml       acc=1.00 script=1.00 off=True inj=True
+or       acc=1.00 script=1.00 off=True inj=True
+pa       acc=1.00 script=1.00 off=True inj=True
+hi-Latn  acc=1.00 script=1.00 off=True inj=True
+[1/7] intake: 3 documents loaded
+[2/7] requirements written (2 clarifying question(s) asked)
+[3/7] groundability: BLOCKED - {'supported': 0, 'partial': 0, 'unsupported': 10, 'ignored_not_in_brief': 0}
+Traceback (most recent call last):
+  File "C:\Users\Admin\Desktop\MARI APP Project\stress\multilingual_bench.py", line 108, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\Users\Admin\Desktop\MARI APP Project\stress\multilingual_bench.py", line 103, in main
+    (OUT / "hindi.json").write_text(json.dumps(hindi(), indent=2, ensure_ascii=False), encoding="utf-8")
+                                               ~~~~~^^
+  File "C:\Users\Admin\Desktop\MARI APP Project\stress\multilingual_bench.py", line 78, in hindi
+    run_factory((d / "brief.txt").read_text(encoding="utf-8"), d / "docs", out, answers=json.loads((d / "answers.json").read_text(encoding="utf-8")), llm=LLM(trace_path=out / "llm_trace.jsonl"), log=print)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\Desktop\MARI APP Project\forgeai\factory.py", line 228, in run_factory
+    raise Blocked(report["message"])
+forgeai.errors.Blocked: The documents cannot support this brief. No agent was generated because it would have to hallucinate.
+exit=1

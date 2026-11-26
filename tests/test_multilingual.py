@@ -164,3 +164,88 @@ def test_requirements_detect_the_documents_language(corpus):
                                                   "must_answer_topics": ["leave"], "must_refuse_topics": [], "escalation": "HR"}), model="s")
     req = build_requirements("உதவியாளர் தேவை HR கொள்கை கேள்விகளுக்கு பதிலளிக்க", docs, [], llm)
     assert req["language_code"] == "ta" and req["language"] == "Tamil"  # the documents decide, not the model's "English"
+
+
+def test_embedder_choice_prefers_the_multilingual_model(monkeypatch, corpus):
+    import forgeai.factory as fac
+
+    monkeypatch.setattr(fac.OllamaEmbedder, "available", lambda self: True)  # pretend every model is installed
+    hi, _ = load_folder(corpus / "hi")
+    en, _ = load_folder(corpus / "en")
+    assert fac.pick_embed_model(hi, "http://x") == "bge-m3"
+    assert fac.pick_embed_model(en, "http://x") == "bge-m3"  # English documents too: users may ask in any language
+    assert fac.pick_embed_model(en, "http://x", "bge-m3") == "bge-m3"  # explicit wins
+    monkeypatch.setattr(fac.OllamaEmbedder, "available", lambda self: self.model == "nomic-embed-text")
+    assert fac.pick_embed_model(hi, "http://x") == "nomic-embed-text"  # falls back to what is installed
+    monkeypatch.setattr(fac.OllamaEmbedder, "available", lambda self: False)
+    assert fac.pick_embed_model(hi, "http://x") is None
+
+
+# ---------------------------------------------------------------- the Hindi guard bug (real-model finding)
+HI_MAP = {"Annual leave": "वार्षिक छुट्टी", "Expense claims": "खर्च के दावे", "Overtime pay": "ओवरटाइम का भुगतान", "Pension contributions": "पेंशन योगदान"}
+EN_TOPICS = list(HI_MAP)
+
+
+def _hindi_req():
+    return {"brief": "मुझे एक असिस्टेंट चाहिए जो HR नीति के प्रश्नों के उत्तर दे: छुट्टी, ओवरटाइम और खर्च के दावे।", "purpose": "Answer HR policy questions",
+            "must_answer_topics": EN_TOPICS, "must_refuse_topics": [], "escalation": "HR"}
+
+
+def test_english_topics_over_hindi_documents_are_translated_and_not_blocked(corpus):
+    """Real run: the requirements model wrote English topics for a Hindi brief; word overlap with the Hindi documents was 0, so
+    all 10 topics were 'unsupported' and the build was BLOCKED although the documents covered them."""
+    from test_forgeai import scripted
+
+    from forgeai.groundability import groundability_guard
+
+    def handler(task, system, user):
+        if task == "translate_topic":
+            return json.dumps({"text": HI_MAP.get(user.strip(), user.strip())})
+        return scripted(task, system, user)
+
+    docs, _ = load_folder(corpus / "hi")
+    rep, narrowed = groundability_guard(_hindi_req(), docs, ScriptedLLM(handler, model="s"))
+    verdicts = {t["topic"]: t["verdict"] for t in rep["topics"]}
+    assert rep["status"] == "warn", rep  # not "blocked"
+    assert [verdicts[t] for t in ("Annual leave", "Expense claims", "Overtime pay")] == ["supported"] * 3
+    assert verdicts["Pension contributions"] == "unsupported" and narrowed["known_gaps"] == ["Pension contributions"]  # real gaps are still caught
+    assert any("translated to Hindi" in n for t in rep["topics"] for n in t["notes"])
+
+
+def test_topics_that_cannot_be_translated_are_flagged_not_declared_unsupported(corpus):
+    from forgeai.groundability import groundability_guard
+
+    docs, _ = load_folder(corpus / "hi")
+    echo = ScriptedLLM(lambda t, s, u: json.dumps({"text": u.strip()}) if t == "translate_topic" else "{}", model="s")  # model just echoes English
+    rep, _ = groundability_guard(_hindi_req(), docs, echo)
+    assert rep["status"] == "warn" and all(t["verdict"] == "partial" for t in rep["topics"])
+    assert all("could not be verified automatically" in t["notes"][0] for t in rep["topics"])
+
+
+def test_hindi_topics_over_english_documents_also_work(corpus):
+    from test_forgeai import scripted
+
+    from forgeai.groundability import groundability_guard
+
+    rev = {v: k for k, v in HI_MAP.items()}
+
+    def handler(task, system, user):
+        if task == "translate_topic":
+            return json.dumps({"text": rev.get(user.strip(), user.strip())})
+        return scripted(task, system, user)
+
+    docs, _ = load_folder(corpus / "en")
+    req = {"brief": "Assistant for HR questions about leave, overtime and expense claims.", "purpose": "HR policy questions", "must_answer_topics": list(HI_MAP.values()), "must_refuse_topics": [], "escalation": "HR"}
+    rep, _ = groundability_guard(req, docs, ScriptedLLM(handler, model="s"))
+    assert rep["status"] != "blocked" and sum(t["verdict"] == "supported" for t in rep["topics"]) >= 3
+
+
+def test_intake_prompts_ask_for_the_documents_language(corpus):
+    from forgeai.intake import build_requirements, propose_questions
+
+    seen = []
+    llm = ScriptedLLM(lambda t, s, u: seen.append((t, s)) or "{}", model="s")
+    docs, _ = load_folder(corpus / "hi")
+    propose_questions("मुझे एक असिस्टेंट चाहिए जो HR प्रश्नों के उत्तर दे", docs, llm)
+    build_requirements("मुझे एक असिस्टेंट चाहिए जो HR प्रश्नों के उत्तर दे", docs, [], llm)
+    assert {t: "Hindi" in s for t, s in seen} == {"intake_questions": True, "requirements": True}

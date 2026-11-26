@@ -14,10 +14,11 @@ import re
 from .docs import Document, chunk_documents
 from .errors import BudgetExceeded, ModelUnavailable
 from .i18n import has_modal
-from .lang import normalize_text
+from .lang import LANGS, corpus_language, detect_language, normalize_text
 from .llm import LLM
+from .parallel import pmap
 from .prompts import render
-from .schemas import GroundCheckOut
+from .schemas import GroundCheckOut, TranslationOut
 from .retrieval import Retriever, tokenize
 from .textutil import quote_in
 from .tools import evidence_hits
@@ -93,6 +94,21 @@ def check_topic(topic: str, retr: Retriever, llm: LLM | None) -> dict:
     return res
 
 
+def translate_topic(text: str, target_code: str, llm: LLM | None) -> str | None:
+    """Translate a short topic into the documents' language so that lexical matching is meaningful. The result is accepted only if
+    it really is in the target script (a small model sometimes just echoes the English back); otherwise None."""
+    if llm is None:
+        return None
+    sysm, user = render("translate_topic", language=LANGS[target_code]["name"], text=text)
+    try:
+        out = llm.json(sysm, user, task="translate_topic", schema=TranslationOut, max_tokens=80)["text"].strip()
+    except (BudgetExceeded, ModelUnavailable):
+        raise
+    except Exception:  # noqa: BLE001
+        return None
+    return out if out and detect_language(out)["script"] == LANGS[target_code]["script"] else None
+
+
 def _tool_covered(topic: str) -> bool:
     return any(evidence_hits(t, topic) for t in ("open_meteo_weather", "current_date"))
 
@@ -100,28 +116,56 @@ def _tool_covered(topic: str) -> bool:
 def groundability_guard(req: dict, docs: list[Document], llm: LLM | None) -> tuple[dict, dict]:
     """Returns (report, narrowed_requirements)."""
     retr = Retriever(chunk_documents(docs, 120, 30))
+    doc_lang = corpus_language([d.text for d in docs])
+    doc_script = LANGS[doc_lang["code"]]["script"]
+    translations: dict[str, str | None] = {}
+
+    def checked(text: str) -> dict:
+        """check_topic, but if the topic is written in a different script than the documents (e.g. English topics for Hindi
+        documents), match on its translation. If it cannot be translated the topic cannot be verified lexically: it is marked
+        'partial' with a note (visible in the report) instead of being declared unsupported, which wrongly blocked Hindi briefs."""
+        ts = detect_language(text)["script"]
+        if ts == doc_script or detect_language(text)["confidence"] < 0.5:
+            return check_topic(text, retr, llm)
+        if text not in translations:
+            translations[text] = translate_topic(text, doc_lang["code"], llm)
+        tr = translations[text]
+        if tr is None:
+            return {"topic": text, "verdict": "partial", "coverage": None, "top_docs": [],
+                    "notes": [f"written in a different language than the documents ({doc_lang['name']}) and could not be translated, so it could not be verified automatically"]}
+        res = check_topic(tr, retr, llm)
+        res["topic"], res["matched_as"] = text, tr
+        res["notes"] = [f"translated to {doc_lang['name']} for matching: {tr}"] + res.get("notes", [])
+        return res
+
     topics = []
     # A topic only counts if the BRIEF asked for it. Small models like to "helpfully" add topics lifted from the document
     # inventory; those would be trivially supported and could mask an unsupportable brief.
     brief_toks = {t for t in tokenize(req.get("brief", "")) if len(t) > 3}
 
+    brief_script = detect_language(req.get("brief", ""))["script"]
+
     def _requested(topic: str) -> bool:
+        if detect_language(topic)["script"] != brief_script:  # different language/script: word overlap is meaningless here
+            return True
         tt = {t for t in tokenize(topic) if len(t) > 3}
         return not brief_toks or not tt or bool(tt & brief_toks)
 
     flags = {t: _requested(t) for t in req["must_answer_topics"]}
     if not any(flags.values()):  # nothing overlaps the brief wording at all: fall back to trusting the list
         flags = {t: True for t in flags}
-    for t in req["must_answer_topics"]:
+    def one(t: str) -> dict:
         if not flags[t]:
-            topics.append({"topic": t, "verdict": "not_requested", "coverage": None,
-                           "notes": ["not asked for in the brief (added by the requirements model); ignored and removed from scope"]})
-            continue
+            return {"topic": t, "verdict": "not_requested", "coverage": None,
+                    "notes": ["not asked for in the brief (added by the requirements model); ignored and removed from scope"]}
         if _tool_covered(t):
-            topics.append({"topic": t, "verdict": "supported_by_tool", "coverage": None, "notes": ["answerable via a live tool, not documents"]})
-        else:
-            topics.append(check_topic(t, retr, llm))
-    purpose = check_topic(req["purpose"], retr, llm) if not _tool_covered(req["purpose"]) else {"verdict": "supported_by_tool"}
+            return {"topic": t, "verdict": "supported_by_tool", "coverage": None, "notes": ["answerable via a live tool, not documents"]}
+        return checked(t)
+
+    # every topic and the purpose are checked (in parallel; order is kept)
+    done = pmap(lambda t: {"verdict": "supported_by_tool"} if (t is None and _tool_covered(req["purpose"])) else checked(req["purpose"]) if t is None else one(t),
+                [*req["must_answer_topics"], None])
+    topics, purpose = done[:-1], done[-1]
 
     ignored = [t for t in topics if t["verdict"] == "not_requested"]
     topics_req = [t for t in topics if t["verdict"] != "not_requested"]

@@ -17,7 +17,7 @@ MAX_QUESTIONS = 5
 
 
 def propose_questions(brief: str, docs: list[Document], llm: LLM) -> list[dict]:
-    sysm, user = render("intake_questions", max_q=str(MAX_QUESTIONS), brief=brief, inventory=inventory_for_prompt(docs))
+    sysm, user = render("intake_questions", max_q=str(MAX_QUESTIONS), brief=brief, inventory=inventory_for_prompt(docs), language=corpus_language([d.text for d in docs] + [brief])["name"])
     try:
         data = llm.json(sysm, user, task="intake_questions", schema=QuestionsOut, max_tokens=600)
         qs = data.get("questions", []) if isinstance(data, dict) else data
@@ -92,7 +92,7 @@ def build_requirements(brief: str, docs: list[Document], qa: list[dict], llm: LL
     qa_txt = "\n".join(
         f"- {q['question']} -> {q['answer']}" + ("  [ASSUMED DEFAULT]" if q["source"] != "requester" else "") for q in qa
     ) or "(no questions were needed)"
-    sysm, user = render("requirements", brief=brief, qa=qa_txt, inventory=inventory_for_prompt(docs))
+    sysm, user = render("requirements", brief=brief, qa=qa_txt, inventory=inventory_for_prompt(docs), language=corpus_language([d.text for d in docs] + [brief])["name"])
     try:
         d = llm.json(sysm, user, task="requirements", schema=RequirementsOut, max_tokens=900)
         if not isinstance(d, dict):
@@ -118,7 +118,7 @@ def build_requirements(brief: str, docs: list[Document], qa: list[dict], llm: LL
         "language": language_name,
         "language_code": lang["code"],
         "language_shares": lang["shares"],
-        "must_answer_topics": _as_list(d.get("must_answer_topics")) or heads[:6],
+        "must_answer_topics": _as_list(d.get("must_answer_topics")) or heads[:6] or [brief.strip()[:80]],  # never empty: the brief itself is the last resort
         "must_refuse_topics": _as_list(d.get("must_refuse_topics"), 8)
         or ["Anything not stated in the provided documents", "Legal, medical or financial advice"],
         "escalation": clean_escalation(str(d.get("escalation") or "")),

@@ -309,3 +309,12 @@ def test_compound_questions_get_passages_for_every_part():
                            "title": "HR Bot", "must_answer_topics": ["leave"], "must_refuse_topics": [], "escalation": "HR", "known_gaps": []}, docs, None)
     got = {c.doc for c, _ in Agent(defn, ScriptedLLM(scripted), docs=docs).retrieve(q)}
     assert {"leave_policy.pdf", "conduct_grievance_and_travel.pdf"} <= got
+
+
+def test_pdf_ligatures_are_expanded_so_words_match():
+    from forgeai.docs import clean_text
+    from forgeai.lang import normalize_text
+
+    lig = "Oﬃce and eﬀective, ﬁbre, ﬂoor"
+    assert clean_text(lig) == "Office and effective, fibre, floor"
+    assert normalize_text(lig) == "office and effective, fibre, floor"

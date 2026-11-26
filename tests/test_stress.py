@@ -48,6 +48,7 @@ def built_agent(corpora, tmp_path_factory):
 
 def test_100_doc_build_stays_within_time_and_memory_budget(corpora, tmp_path):
     proc, peak = psutil.Process(), [0]
+    baseline = proc.memory_info().rss  # other tests (e.g. real OCR) may already have loaded torch into this process: measure growth
     stop = threading.Event()
 
     def watch():
@@ -60,7 +61,7 @@ def test_100_doc_build_stays_within_time_and_memory_budget(corpora, tmp_path):
     run_factory(BRIEF, corpora["L2"][0], tmp_path / "o", llm=ScriptedLLM(scripted, model="scripted"), max_iters=1, log=quiet)
     stop.set()
     assert time.time() - t0 < 90, "100-document build is too slow"
-    assert peak[0] < 1.5 * 1024**3, f"peak memory {peak[0] / 1024**2:.0f} MB"
+    assert peak[0] - baseline < 1.5 * 1024**3, f"memory grew by {(peak[0] - baseline) / 1024**2:.0f} MB"
 
 
 def test_200_parallel_questions_on_one_agent_all_answered_correctly(built_agent):

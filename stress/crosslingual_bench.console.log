@@ -1,0 +1,7 @@
+same_language                          bm25: 36/36 (100%)  nomic: 36/36 (100%)  bge-m3: 36/36 (100%)
+indian_question_over_english_docs      bm25: 3/36 (8%)  nomic: 21/36 (58%)  bge-m3: 36/36 (100%)
+    bge-m3 misses by language: none
+english_question_over_indian_docs      bm25: 3/36 (8%)  nomic: 3/36 (8%)  bge-m3: 36/36 (100%)
+    bge-m3 misses by language: none
+took 235s
+exit=0

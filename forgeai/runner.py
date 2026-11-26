@@ -33,7 +33,7 @@ class Agent:
     def __init__(self, defn: dict, llm: LLM, docs: list[Document] | None = None, base_dir: str | Path | None = None, embedder=None):
         self.defn, self.llm = defn, llm
         if docs is None:
-            docs, _ = load_folder(Path(base_dir or ".") / defn["knowledge"]["documents_dir"])
+            docs, _ = load_folder(Path(base_dir or ".") / defn["knowledge"]["documents_dir"], ocr_langs=defn["knowledge"].get("ocr_langs"))
         self.docs = docs
         self.doc_names = {d.name for d in docs}
         kn = defn["knowledge"]
@@ -159,6 +159,11 @@ class Agent:
         ev = [str(e) for e in ev if str(e).strip()]
         if not ans:
             v.append("empty_answer")
+        sp = self.defn["system_prompt"]
+        known = {m.strip() for m in [sp.get("refusal_message", ""), *(sp.get("refusal_messages") or {}).values()] if m and m.strip()}
+        if not refused and ans.strip() in known:  # the model wrote the refusal text but forgot the flag: it must not be shown with sources as an answer
+            refused, clean, ev = True, [], []
+            v.append("refusal_flag_repaired")
         if not refused and self.defn["output_contract"].get("citation_required") and not clean and not tool_calls:
             v.append("missing_citation")  # the MODEL broke the contract; recorded and counted, then repaired by code below
             clean = self._attribute(ans, retrieved or [])

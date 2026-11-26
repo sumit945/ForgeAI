@@ -20,12 +20,15 @@ from typing import Callable
 from .docs import inventory, load_folder
 from .embeddings import OllamaEmbedder
 from .errors import Blocked, BudgetExceeded, ForgeError, InputError, ModelOutputError, ModelUnavailable
-from .evalgen import generate_eval_set
+from . import evalcache
+from .evalgen import DEFAULT_QUOTAS, generate_eval_set
 from .fsutil import atomic_write
 from .generator import generate_agent
 from .groundability import groundability_guard, groundability_markdown
 from .intake import build_requirements, collect_answers, propose_questions, requirements_markdown
 from .judge import calibrate
+from .lang import corpus_language, detect_language
+from .ocr import LANG_MODELS, UNSUPPORTED
 from .llm import LLM, Budget
 from .optimizer import optimise
 from .report import build_report, scorecard_markdown
@@ -33,6 +36,16 @@ from .schemas import validate_definition, validate_evalset, validate_requirement
 
 PIPELINE_VERSION = "2"
 GroundabilityBlocked = Blocked  # backwards-compatible name
+
+
+def pick_embed_model(docs, host: str, explicit: str | None = None) -> str | None:
+    """Choose an installed Ollama embedding model. The multilingual bge-m3 is always preferred: in our benchmark it retrieved the
+    right passage 36/36 for Indian-language questions over English documents and vice versa, where nomic-embed-text managed 21/36
+    and 3/36 and BM25 3/36 (users of an English document set will still ask in Hindi, Tamil, ...). Smaller English-only models are
+    the fallback; an explicit --embed-model always wins."""
+    if explicit:
+        return explicit if OllamaEmbedder(explicit, host).available() else None
+    return next((c for c in ("bge-m3", "nomic-embed-text", "mxbai-embed-large") if OllamaEmbedder(c, host).available()), None)
 
 
 def _w(path: Path, obj) -> None:
@@ -120,7 +133,10 @@ def run_factory(
     approve: bool = False,
     force: bool = False,
     resume: bool = False,
+    fresh_evalset: bool = False,
     embed_model: str | None = None,
+    ocr: str = "auto",
+    ocr_langs: list[str] | None = None,
     max_iters: int = 3,
     target: float = 0.9,
     max_calls: int | None = None,
@@ -149,11 +165,14 @@ def run_factory(
     budget.started = time.time()
     judge_llm.budget = budget
 
-    docs, problems = load_folder(docs_dir)  # raises InputError for an unusable folder
+    if ocr_langs is None:  # scanned pages are read in the language of the brief (the best available hint before any text exists)
+        code = detect_language(brief)["code"]
+        ocr_langs = [code] if code in LANG_MODELS or code in UNSUPPORTED else ["en"]
+    docs, problems = load_folder(docs_dir, ocr=ocr, ocr_langs=ocr_langs)  # raises InputError for an unusable folder
     if not docs:
         raise InputError(f"No readable documents in {docs_dir}. Problems: {problems or 'folder is empty'}")
     doc_digest = [(d.name, hashlib.sha1(d.text.encode("utf-8", "ignore")).hexdigest()[:12]) for d in docs]
-    root_key = _h(PIPELINE_VERSION, brief, doc_digest, llm.model, judge_llm.model, answers, max_iters, target, force)
+    root_key = _h(PIPELINE_VERSION, brief, doc_digest, llm.model, judge_llm.model, answers, max_iters, target, force, ocr, ocr_langs)
     run = Run(out, root_key, resume, log)
     try:
         for p in problems:
@@ -219,25 +238,32 @@ def run_factory(
         # ---- 3. generate agent ---------------------------------------------------
         emb = None
         if backend == "ollama" and llm.__class__.__name__ == "LLM":
-            for cand in ([embed_model] if embed_model else ["nomic-embed-text", "bge-m3", "mxbai-embed-large"]):
-                if OllamaEmbedder(cand, host).available():
-                    emb = cand
-                    break
+            emb = pick_embed_model(docs, host, embed_model)
             if embed_model and not emb:
                 run.warn(f"embedding model '{embed_model}' is not installed; using BM25 retrieval (run: ollama pull {embed_model})")
         log(f"      retrieval: {'hybrid BM25 + ' + emb if emb else 'BM25'}")
-        defn0 = run.stage("generate", (req, emb), lambda: generate_agent(req, docs, llm, embed_model=emb))
+        defn0 = run.stage("generate", (req, emb), lambda: generate_agent(req, docs, llm, embed_model=emb, ocr_langs=ocr_langs))
         validate_definition(defn0)
         _w(out / "05_agent_definition.v0.json", defn0)
         log(f"[4/7] agent generated; tools attached: {defn0['tools'] or 'none'}")
 
         # ---- 4. eval set ---------------------------------------------------------
-        ev = run.stage("evalset", (req, defn0["knowledge"]), lambda: generate_eval_set(docs, req, llm))
+        def make_evalset() -> dict:
+            k = evalcache.key(docs, req, llm, DEFAULT_QUOTAS)
+            hit = None if fresh_evalset else evalcache.load(k)
+            if hit:
+                return evalcache.stamp_reused(hit)
+            fresh = generate_eval_set(docs, req, llm)
+            evalcache.save(k, fresh)
+            return fresh
+
+        ev = run.stage("evalset", (req, defn0["knowledge"], fresh_evalset), make_evalset)
         validate_evalset(ev)
         _w(out / "06_eval_set.json", ev)
         for w in ev.get("warnings", []):
             run.warn(f"eval set: {w}")
-        log(f"[5/7] eval set: {ev['total']} cases {ev['counts']} (rejected {sum(v for k, v in ev['stats'].items() if k.startswith('rejected:'))} unverifiable candidates)")
+        reused = (ev.get("cache") or {}).get("reused")
+        log(f"[5/7] eval set: {ev['total']} cases {ev['counts']} (rejected {sum(v for k, v in ev['stats'].items() if k.startswith('rejected:'))} unverifiable candidates)" + (" - REUSED from an earlier identical build (--fresh-evalset to regenerate)" if reused else ""))
 
         # ---- 5. judge calibration (degradable) ----------------------------------
         cal = run.stage("calibration", (ev["cases"],), lambda: calibrate(ev["cases"], judge_llm), fatal=False, default={"ran": False, "reason": "calibration failed"})

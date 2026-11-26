@@ -43,7 +43,10 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--approve", action="store_true", help="human checkpoint: approve/edit requirements before generation")
     b.add_argument("--force", action="store_true", help="generate even if the groundability guard says BLOCKED")
     b.add_argument("--resume", action="store_true", help="continue an interrupted run: finished stages and evaluated cases are reused")
+    b.add_argument("--fresh-evalset", action="store_true", help="ignore the eval-set cache and generate a new eval set (default: reuse a verified set from an identical earlier build)")
     b.add_argument("--embed-model", default=None, help="Ollama embedding model for hybrid retrieval (auto-detects nomic-embed-text / bge-m3 if installed)")
+    b.add_argument("--ocr", choices=["auto", "off", "force"], default="auto", help="read scanned PDF pages / image files with OCR (auto: only pages without a text layer)")
+    b.add_argument("--ocr-lang", default=None, help="OCR language codes, e.g. hi or ta (default: language of the brief)")
     b.add_argument("--max-iters", type=int, default=3)
     b.add_argument("--target", type=float, default=0.9, help="stop when dev pass-rate reaches this")
     b.add_argument("--max-calls", type=int, help="LLM call budget")
@@ -61,6 +64,9 @@ def main(argv: list[str] | None = None) -> int:
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)
     sub.add_parser("ui", help="start the Streamlit web UI")
+    o = sub.add_parser("ocr-setup", help="download OCR models for the given languages (explicit, never automatic)")
+    o.add_argument("--langs", default="hi,en", help="comma-separated codes: en hi mr bn ta te kn ur")
+    sub.add_parser("ocr-status", help="show which OCR models are installed")
 
     a = ap.parse_args(argv)
     try:
@@ -70,6 +76,14 @@ def main(argv: list[str] | None = None) -> int:
             chat(a.definition, a.model, a.docs, a.verbose, a.host)
             return 0
 
+        if a.cmd in ("ocr-status", "ocr-setup"):
+            from . import ocr as ocr_mod
+
+            codes = a.langs.split(",") if a.cmd == "ocr-setup" else None
+            st = ocr_mod.setup(codes) if codes else ocr_mod.status()
+            print(json.dumps({k: v for k, v in st.items() if k != "models"}, indent=2))
+            print("models installed:", ", ".join(k for k, v in st.get("models", {}).items() if v) or "none")
+            return 0 if st["available"] or not codes else 1
         if a.cmd == "serve":
             from .service import serve
 
@@ -94,7 +108,7 @@ def main(argv: list[str] | None = None) -> int:
                 return 3
         res = run_factory(
             brief, a.docs, a.out, model=a.model, judge_model=a.judge_model, fallback_models=a.fallback_model, host=a.host,
-            backend=a.backend, answers=answers, interactive=a.interactive, approve=a.approve, force=a.force, resume=a.resume, embed_model=a.embed_model,
+            backend=a.backend, answers=answers, interactive=a.interactive, approve=a.approve, force=a.force, resume=a.resume, fresh_evalset=a.fresh_evalset, embed_model=a.embed_model, ocr=a.ocr, ocr_langs=a.ocr_lang.split(",") if a.ocr_lang else None,
             max_iters=a.max_iters, target=a.target, max_calls=a.max_calls, max_minutes=a.max_minutes,
         )
         if res["warnings"]:

@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import threading
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -18,6 +19,7 @@ from .generator import definition_hash
 from .judge import judge_case, scorecard
 from .errors import BudgetExceeded, ModelOutputError, ModelUnavailable, SchemaError
 from .llm import LLM
+from .parallel import pmap
 from .prompts import render
 from .schemas import GlossaryOut, RuleOut, validate_definition
 from .retrieval import stem, tokenize
@@ -44,6 +46,7 @@ class EvalCache:
 
     def __init__(self, path: Path | None):
         self.path, self.data = path, {}
+        self._lock = threading.Lock()
         if path and path.exists():
             for line in path.read_text(encoding="utf-8").splitlines():
                 try:
@@ -76,28 +79,29 @@ def evaluate(defn: dict, docs: list[Document], cases: list[dict], agent_llm: LLM
     agent = Agent(defn, agent_llm, docs=docs)
     dh = definition_hash(defn)
     jm = judge_llm.model if judge_llm else "none"
-    results, raw = [], {}
-    for c in cases:
+    def one(c: dict) -> tuple[dict, dict]:
         key = EvalCache.key(dh, c, jm)
         if cache and key in cache.data:
-            res, j = cache.data[key]["raw"], cache.data[key]["judged"]
-        else:
-            try:
-                res = agent.answer(c["question"])
-            except ModelOutputError as e:  # one bad generation must not abort the whole evaluation
-                res = _error_answer(c["question"], str(e))
-            try:
-                j = judge_case(c, res, judge_llm)
-            except ModelOutputError:
-                j = judge_case(c, res, None)  # judge model failed: fall back to deterministic checks only
-                j.setdefault("notes", []).append("LLM judge unavailable for this case; deterministic checks only")
-            j["sources"], j["evidence"] = res.get("sources", []), res.get("evidence", [])
-            j["retrieved"] = [h["id"] for h in res.get("retrieved", [])]
-            j["tool_calls"] = [{"tool": t["tool"], "args": t["args"]} for t in res.get("tool_calls", [])]
-            if cache:
-                cache.put(key, res, j)
-        raw[c["id"]] = res
-        results.append(j)
+            return cache.data[key]["raw"], cache.data[key]["judged"]
+        try:
+            res = agent.answer(c["question"])
+        except ModelOutputError as e:  # one bad generation must not abort the whole evaluation
+            res = _error_answer(c["question"], str(e))
+        try:
+            j = judge_case(c, res, judge_llm)
+        except ModelOutputError:
+            j = judge_case(c, res, None)  # judge model failed: fall back to deterministic checks only
+            j.setdefault("notes", []).append("LLM judge unavailable for this case; deterministic checks only")
+        j["sources"], j["evidence"] = res.get("sources", []), res.get("evidence", [])
+        j["retrieved"] = [h["id"] for h in res.get("retrieved", [])]
+        j["tool_calls"] = [{"tool": t["tool"], "args": t["args"]} for t in res.get("tool_calls", [])]
+        if cache:
+            cache.put(key, res, j)
+        return res, j
+
+    pairs = pmap(one, cases)  # independent cases, answered and judged in parallel; order is kept
+    results = [j for _, j in pairs]
+    raw = {c["id"]: res for c, (res, _) in zip(cases, pairs)}
     return agent, results, scorecard(results), raw
 
 

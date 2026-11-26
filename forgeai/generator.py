@@ -124,7 +124,7 @@ def refusal_message(req: dict) -> str:
     return REFUSALS.get(code, REFUSALS["en"]).replace("{x}", clean_escalation(req.get("escalation", "")))
 
 
-def generate_agent(req: dict, docs: list[Document], llm: LLM | None, role_override: str | None = None, embed_model: str | None = None) -> dict:
+def generate_agent(req: dict, docs: list[Document], llm: LLM | None, role_override: str | None = None, embed_model: str | None = None, ocr_langs: list[str] | None = None) -> dict:
     tools = select_tools(req, docs, llm)
     chunking = choose_chunking(docs)
     defn = {
@@ -142,6 +142,7 @@ def generate_agent(req: dict, docs: list[Document], llm: LLM | None, role_overri
         },
         "knowledge": {
             "documents_dir": "docs",
+            "ocr_langs": ocr_langs or ["en"],
             "documents": [d.name for d in docs],
             "chunking": chunking,
             "retrieval": {"method": "hybrid" if embed_model else "bm25", "embedder": f"ollama:{embed_model}" if embed_model else None,

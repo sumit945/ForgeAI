@@ -39,8 +39,8 @@ from .runner import Agent
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 MAX_FILES_PER_JOB = 100
 MAX_BRIEF_CHARS = 4000
-RUN_KWARGS = {"judge_model", "host", "backend", "max_iters", "target", "max_calls", "max_minutes", "embed_model", "force"}
-ALLOWED_PARAMS = {"model", "judge_model", "host", "backend", "max_iters", "target", "max_calls", "max_minutes", "embed_model", "force"}
+RUN_KWARGS = {"judge_model", "host", "backend", "max_iters", "target", "max_calls", "max_minutes", "embed_model", "force", "ocr", "ocr_langs", "fresh_evalset"}
+ALLOWED_PARAMS = {"model", "judge_model", "host", "backend", "max_iters", "target", "max_calls", "max_minutes", "embed_model", "force", "ocr", "ocr_langs", "fresh_evalset"}
 
 
 def safe_name(name: str) -> str:

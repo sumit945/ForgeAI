@@ -105,6 +105,10 @@ class QuestionListOut(_Lenient):
     _l = field_validator("questions", mode="before")(lambda cls, v: _str_list(v))
 
 
+class TranslationOut(_Lenient):
+    text: str = Field(min_length=2)
+
+
 class RuleOut(_Lenient):
     rule: str = Field(min_length=8)
 

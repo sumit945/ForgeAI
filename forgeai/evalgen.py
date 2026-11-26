@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import random
 import re
+import threading
 from collections import Counter
 
 from .docs import Document, chunk_documents
@@ -14,6 +15,7 @@ from .i18n import SEEDS
 from .lang import LANGS, corpus_language
 from .errors import BudgetExceeded, ModelUnavailable
 from .llm import LLM
+from .parallel import pmap, workers
 from .prompts import render
 from .schemas import AnswerableOut, QuestionListOut, validate_evalset
 from .retrieval import Retriever, tokenize
@@ -61,10 +63,12 @@ class Gen:
         self.rejected: list[dict] = []
         self.asked: dict[str, list[str]] = {}
         self.lang_label = "English"
+        self._lock = threading.Lock()  # candidates are verified by parallel workers
 
     def reject(self, kind: str, reason: str, detail: str = "") -> None:
-        self.stats[f"rejected:{reason}"] += 1
-        self.rejected.append({"kind": kind, "reason": reason, "detail": detail[:200]})
+        with self._lock:
+            self.stats[f"rejected:{reason}"] += 1
+            self.rejected.append({"kind": kind, "reason": reason, "detail": detail[:200]})
 
     def dup(self, q: str) -> bool:
         return any(jaccard(q, c["question"]) > 0.7 for c in self.cases)
@@ -173,13 +177,15 @@ def generate_eval_set(
     base_cases: list[dict] = []
     cyc = 0
     while len(base_cases) < pool_target and g.stats["attempts:answerable"] < pool_target * 6 and order:
-        p = order[cyc % len(order)]
-        cyc += 1
-        g.stats["attempts:answerable"] += 1
-        c = _answerable(g, llm, p)
-        if c and not g.dup(c["question"]):
-            base_cases.append(c)
-            g.cases.append({**c, "id": "_tmp"})  # reserve for dedup
+        wave = []  # distinct passages, asked in parallel; results are then verified and de-duplicated in order
+        for _ in range(min(workers(), len(order), pool_target * 6 - g.stats["attempts:answerable"])):
+            wave.append(order[cyc % len(order)])
+            cyc += 1
+        g.stats["attempts:answerable"] += len(wave)
+        for c in pmap(lambda p: _answerable(g, llm, p), wave):
+            if c and len(base_cases) < pool_target and not g.dup(c["question"]):
+                base_cases.append(c)
+                g.cases.append({**c, "id": "_tmp"})  # reserve for dedup
     g.cases = []
     plain, to_para = base_cases[: quotas["answerable"]], base_cases[quotas["answerable"] :]
     for c in plain:
@@ -325,12 +331,14 @@ def generate_eval_set(
     short = 21 - len(g.cases)
     i = 0
     while short > 0 and order and g.stats["attempts:topup"] < 40:
-        p = order[i % len(order)]
-        i += 1
-        g.stats["attempts:topup"] += 1
-        c = _answerable(g, llm, p)
-        if c and g.add(c):
-            short -= 1
+        wave = []
+        for _ in range(min(workers(), len(order), 40 - g.stats["attempts:topup"])):
+            wave.append(order[i % len(order)])
+            i += 1
+        g.stats["attempts:topup"] += len(wave)
+        for c in pmap(lambda p: _answerable(g, llm, p), wave):
+            if short > 0 and c and g.add(c):
+                short -= 1
 
     # dev / hold-out split, stratified by category. The optimizer only ever sees `dev`.
     by_cat: dict[str, list[dict]] = {}

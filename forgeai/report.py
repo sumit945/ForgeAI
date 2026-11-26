@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import time
 
 
 def pct(x) -> str:
@@ -117,6 +118,11 @@ def build_report(ctx: dict) -> str:
                  "Expected facts are verified verbatim against the source text.")
     for w in ev.get("warnings", []):
         lines.append(f"- **WARNING:** {w}")
+    cache = ev.get("cache") or {}
+    if cache.get("reused"):
+        when = time.strftime("%Y-%m-%d %H:%M", time.localtime(cache["created"])) if cache.get("created") else "an earlier build"
+        lines.append(f"- This eval set was **reused** from an earlier build ({when}) because the documents, requirements, model and generator were identical. The cases were verified when they were generated; "
+                     "the agent itself was built and scored fresh. Use `--fresh-evalset` to generate a new set.")
     if cal.get("ran"):
         flag = "" if (cal["reliability"] or 0) >= 0.75 else "  **WARNING: judge reliability below 0.75 - treat LLM-rescued verdicts with suspicion.**"
         lines.append(f"- Judge calibration (known-answer canaries: gold / wrong / padded-wrong / altered-number / fact-order swap): reliability **{cal['reliability']}**, by kind {cal['by_kind']}.{flag}")

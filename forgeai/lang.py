@@ -55,7 +55,8 @@ _PUNCT_MAP = {0x0964: ".", 0x0965: ".", 0x06D4: ".", 0x061F: "?", 0x060C: ",", 0
               0x093C: None, 0x0901: 0x0902, 0x064A: 0x06CC, 0x0649: 0x06CC, 0x0643: 0x06A9, 0x0640: None}
 for _cp in range(0x064B, 0x0660):  # Arabic diacritics (harakat)
     _PUNCT_MAP[_cp] = None
-_TRANS = {**DIGIT_MAP, **{k: v for k, v in _PUNCT_MAP.items()}}
+_LIGATURES = {0xFB00: "ff", 0xFB01: "fi", 0xFB02: "fl", 0xFB03: "ffi", 0xFB04: "ffl", 0xFB05: "st", 0xFB06: "st"}
+_TRANS = {**DIGIT_MAP, **{k: v for k, v in _PUNCT_MAP.items()}, **_LIGATURES}
 _CTRL = re.compile(r"[‪-‮⁦-⁩﻿]")  # bidi controls and BOM
 
 
