@@ -23,7 +23,7 @@ INJECTION_RE = [re.compile(p, re.I) for p in (
 )]
 # Extra patterns that are only checked on USER input (too common in ordinary document prose, e.g. "you are now eligible").
 USER_ONLY_RE = [re.compile(p, re.I) for p in (
-    r"\byou are now\b", r"\bpretend (?:to be|you are|that you)\b", r"\bjailbreak\b", r"\bdeveloper mode\b", r"\bact as (?:if|though) you (?:have|had) no\b",
+    r"\byou are (?:now|no longer) (?:a|an|the|my|dan|free|unrestricted|jailbroken|evil|bound by no)\b", r"\bpretend (?:to be|you are|that you)\b", r"\bjailbreak\b", r"\bdeveloper mode\b", r"\bact as (?:if|though) you (?:have|had) no\b",
     r"\bforget (?:all |everything |your )(?:previous |prior |the )?(?:instructions|rules|training)\b",
 )]
 _SENT = re.compile(r"(?<=[.!?])\s+")
