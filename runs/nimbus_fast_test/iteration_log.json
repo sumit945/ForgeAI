@@ -1,0 +1,242 @@
+{
+  "baseline": {
+    "iteration": 0,
+    "definition_hash": "ed89033314",
+    "scorecard": {
+      "overall": {
+        "n": 22,
+        "pass_rate": 0.773,
+        "correct_rate": 0.688,
+        "grounded_rate": 0.875,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.062,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.818
+      },
+      "dev": {
+        "n": 16,
+        "pass_rate": 0.812,
+        "correct_rate": 0.727,
+        "grounded_rate": 0.909,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.091,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.75
+      },
+      "holdout": {
+        "n": 6,
+        "pass_rate": 0.667,
+        "correct_rate": 0.6,
+        "grounded_rate": 0.8,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 1.0
+      },
+      "by_category": {
+        "ambiguous": {
+          "n": 4,
+          "pass_rate": 0.75
+        },
+        "answerable": {
+          "n": 9,
+          "pass_rate": 0.778
+        },
+        "multi_doc": {
+          "n": 3,
+          "pass_rate": 0.333
+        },
+        "near_miss": {
+          "n": 2,
+          "pass_rate": 1.0
+        },
+        "off_topic": {
+          "n": 4,
+          "pass_rate": 1.0
+        }
+      }
+    }
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "accepted": true,
+      "score_before": {
+        "dev": 0.812,
+        "holdout": 0.667,
+        "overall": 0.773
+      },
+      "score_after": {
+        "dev": 0.875,
+        "holdout": 0.667,
+        "overall": 0.818
+      },
+      "failures_classified": [
+        {
+          "id": "amb-01",
+          "category": "wrong_refusal",
+          "why": "the needed passage WAS in context but the agent refused",
+          "question": "Nimbus Fibre's office loc?",
+          "answer": "I can't answer that from the documents I have. For this, please contact the relevant team.",
+          "notes": [
+            "no source cited"
+          ]
+        },
+        {
+          "id": "mul-01",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "What is the minimum late payment fee and when does it apply? Also, when does a promotion code expire if used on a connection, and what is the maximum number of promotion codes that can be used simultaneously?",
+          "answer": "The minimum late payment fee is Rs. 50 per invoice and it applies when an invoice is not paid by the due date and a late payment fee of 2% per month on the overdue amount is applied, with a minimum of Rs. 50 per invoice.",
+          "notes": [
+            "LLM judge reports contradiction"
+          ]
+        },
+        {
+          "id": "mul-02",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "When should a billing dispute be raised to ensure a timely resolution according to the terms of service? Also, what is the maximum number of times a customer can downgrade their plan within a six-month period?",
+          "answer": "A billing dispute must be raised within 30 days of the invoice date, through the Nimbus app or by contacting support. The maximum number of times a customer can downgrade their plan within a six-month period is once.",
+          "notes": []
+        }
+      ],
+      "failure_counts_before": {
+        "wrong_refusal": 1,
+        "prompt_defect": 2
+      },
+      "changes": [
+        {
+          "type": "add_prompt_rule",
+          "target": "system_prompt.rules[fix-wrong_refusal-9]",
+          "before": null,
+          "after": "If the answer is within the context, provide it directly or combine relevant excerpts without setting refused=true.",
+          "origin": "llm",
+          "category": "wrong_refusal",
+          "why": "1 case(s): the assistant refused although the context contained the answer",
+          "cases": [
+            "amb-01"
+          ]
+        }
+      ],
+      "failures_targeted": [
+        "amb-01"
+      ],
+      "fixed": [
+        "amb-01"
+      ],
+      "regressed": [],
+      "definition_hash_before": "ed89033314",
+      "definition_hash_after": "0f7cf92189",
+      "decision": "accepted after ablation: the combined patch regressed, but the 'wrong_refusal' fix alone improved dev 81% -> 88%",
+      "ablation_trials": [
+        {
+          "category": "prompt_defect",
+          "changes": [
+            {
+              "type": "add_prompt_rule",
+              "target": "system_prompt.rules[fix-prompt_defect-9]",
+              "before": null,
+              "after": "Provide all required facts, including exact dates and limits, and cite the source document for each fact.",
+              "origin": "llm",
+              "category": "prompt_defect",
+              "why": "2 case(s): the assistant had the right context but omitted required facts, ignored scope, or skipped citations",
+              "cases": [
+                "mul-01",
+                "mul-02"
+              ]
+            }
+          ],
+          "dev_after": 0.812,
+          "holdout_after": 0.667,
+          "accepted": false
+        },
+        {
+          "category": "wrong_refusal",
+          "changes": [
+            {
+              "type": "add_prompt_rule",
+              "target": "system_prompt.rules[fix-wrong_refusal-9]",
+              "before": null,
+              "after": "If the answer is within the context, provide it directly or combine relevant excerpts without setting refused=true.",
+              "origin": "llm",
+              "category": "wrong_refusal",
+              "why": "1 case(s): the assistant refused although the context contained the answer",
+              "cases": [
+                "amb-01"
+              ]
+            }
+          ],
+          "dev_after": 0.875,
+          "holdout_after": 0.667,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "accepted": false,
+      "score_before": {
+        "dev": 0.875,
+        "holdout": 0.667,
+        "overall": 0.818
+      },
+      "score_after": {
+        "dev": 0.812,
+        "holdout": 0.667,
+        "overall": 0.773
+      },
+      "failures_classified": [
+        {
+          "id": "mul-01",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "What is the minimum late payment fee and when does it apply? Also, when does a promotion code expire if used on a connection, and what is the maximum number of promotion codes that can be used simultaneously?",
+          "answer": "The minimum late payment fee is Rs. 50 per invoice. It applies when an invoice is not paid by the due date and a late payment fee of 2% per month on the overdue amount is applied, with a minimum of Rs. 50 per invoice. A promotion code cannot be used after registration and cannot be used again to a c",
+          "notes": [
+            "LLM judge reports contradiction"
+          ]
+        },
+        {
+          "id": "mul-02",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "When should a billing dispute be raised to ensure a timely resolution according to the terms of service? Also, what is the maximum number of times a customer can downgrade their plan within a six-month period?",
+          "answer": "A billing dispute must be raised within 30 days of the invoice date, and Nimbus will give a decision within 15 days of the dispute being raised. The maximum number of times a customer can downgrade their plan within a six-month period is once.",
+          "notes": []
+        }
+      ],
+      "failure_counts_before": {
+        "prompt_defect": 2
+      },
+      "changes": [
+        {
+          "type": "add_prompt_rule",
+          "target": "system_prompt.rules[fix-prompt_defect-10]",
+          "before": null,
+          "after": "Provide all required facts, including exact numbers and dates, and cite documents used when applicable.",
+          "origin": "llm",
+          "category": "prompt_defect",
+          "why": "2 case(s): the assistant had the right context but omitted required facts, ignored scope, or skipped citations",
+          "cases": [
+            "mul-01",
+            "mul-02"
+          ]
+        }
+      ],
+      "failures_targeted": [
+        "mul-01",
+        "mul-02"
+      ],
+      "fixed": [],
+      "regressed": [
+        "amb-01"
+      ],
+      "definition_hash_before": "0f7cf92189",
+      "definition_hash_after": "6f9967c6c1",
+      "decision": "REVERTED: dev pass-rate 88% -> 81% (no strict improvement)",
+      "ablation_trials": []
+    }
+  ],
+  "stop_reason": "no applicable targeted fix remains"
+}

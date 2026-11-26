@@ -1,0 +1,46 @@
+{
+  "max_questions": 5,
+  "asked": 5,
+  "qa": [
+    {
+      "id": "q1",
+      "question": "What is the specific audience for this AI-assistant, the technical superintendents or a broader group of fleet managers?",
+      "why": "The brief mentions technical superintendents but does not specify if this is the only audience or if there are others.",
+      "default": "technical superintendents",
+      "answer": "Technical superintendents and fleet managers, English, quoting part numbers and USD amounts.",
+      "source": "requester"
+    },
+    {
+      "id": "q2",
+      "question": "Should the assistant be more precise in terms of the language used, or is a more general tone acceptable?",
+      "why": "The brief does not specify the tone, so we need to determine if a more precise and concise tone is required.",
+      "default": "more precise and concise",
+      "answer": "more precise and concise",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q3",
+      "question": "Should the assistant be strict in enforcing approval limits, or should it be more flexible in handling orders that are just under the limit?",
+      "why": "The brief does not specify the strictness level, so we need to determine if the assistant should be strict or flexible.",
+      "default": "strict",
+      "answer": "strict",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q4",
+      "question": "Should the assistant be able to handle orders that are split across multiple purchase orders, or should it enforce the approval limit strictly?",
+      "why": "The brief does not specify how to handle orders just under the limit, so we need to determine if the assistant should be able to split orders or enforce strict limits.",
+      "default": "strict",
+      "answer": "strict",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q5",
+      "question": "Should the assistant include information on fuel prices or charter decisions in its recommendations?",
+      "why": "The brief explicitly states that the assistant should not advise on fuel prices or charter decisions, so we need to confirm if this is the case.",
+      "default": "no",
+      "answer": "no",
+      "source": "assumed-default"
+    }
+  ]
+}

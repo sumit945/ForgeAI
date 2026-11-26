@@ -1,0 +1,46 @@
+{
+  "max_questions": 5,
+  "asked": 5,
+  "qa": [
+    {
+      "id": "q1",
+      "question": "What specific HR policies and procedures related to health insurance and pension contributions should the assistant cover?",
+      "why": "The brief mentions explaining health insurance and pension contributions, but does not specify which policies or procedures should be covered.",
+      "default": "The assistant should cover the policies and procedures related to health insurance and pension contributions as outlined in the HR policies and procedures documents available.",
+      "answer": "Shore-based office and operations staff of all grades, not seafarers.",
+      "source": "requester"
+    },
+    {
+      "id": "q2",
+      "question": "What is the current version of the HR policies and procedures that the assistant should reference?",
+      "why": "The brief mentions the policies are effective as of 1 January 2026, but does not specify which version of the policies should be referenced.",
+      "default": "The assistant should reference the version of the HR policies and procedures that is effective as of 1 January 2026.",
+      "answer": "Friendly but precise; short answers with the exact numbers.",
+      "source": "requester"
+    },
+    {
+      "id": "q3",
+      "question": "Should the assistant include any specific language or tone guidelines for interacting with shore staff regarding HR policies?",
+      "why": "The brief mentions the assistant should be friendly and exact, but does not specify any particular language or tone guidelines.",
+      "default": "The assistant should be friendly and exact, and use the language and tone guidelines provided in the available documents.",
+      "answer": "The assistant should be friendly and exact, and use the language and tone guidelines provided in the available documents.",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q4",
+      "question": "Should the assistant include any specific instructions or links for shore staff to raise grievances or seek further information?",
+      "why": "The brief mentions the assistant should explain how to raise a grievance, but does not specify any particular instructions or links.",
+      "default": "The assistant should include specific instructions or links for shore staff to raise grievances or seek further information, based on the available 'conduct_grievance_and_travel.pdf' document.",
+      "answer": "The assistant should include specific instructions or links for shore staff to raise grievances or seek further information, based on the available 'conduct_grievance_and_travel.pdf' document.",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q5",
+      "question": "Should the assistant include any specific instructions or links for shore staff to access health insurance and pension contribution information?",
+      "why": "The brief mentions the assistant should explain health insurance and pension contributions, but does not specify any particular instructions or links.",
+      "default": "The assistant should include specific instructions or links for shore staff to access health insurance and pension contribution information, based on the available 'leave_policy.pdf' and 'working_hours_and_overtime.pdf' documents.",
+      "answer": "The assistant should include specific instructions or links for shore staff to access health insurance and pension contribution information, based on the available 'leave_policy.pdf' and 'working_hours_and_overtime.pdf' documents.",
+      "source": "assumed-default"
+    }
+  ]
+}

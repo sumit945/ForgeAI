@@ -1,0 +1,115 @@
+{
+  "baseline": {
+    "iteration": 0,
+    "definition_hash": "20a2d09101",
+    "scorecard": {
+      "overall": {
+        "n": 21,
+        "pass_rate": 0.952,
+        "correct_rate": 0.923,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.667
+      },
+      "dev": {
+        "n": 15,
+        "pass_rate": 1.0,
+        "correct_rate": 1.0,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.667
+      },
+      "holdout": {
+        "n": 6,
+        "pass_rate": 0.833,
+        "correct_rate": 0.75,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.667
+      },
+      "by_category": {
+        "ambiguous": {
+          "n": 1,
+          "pass_rate": 1.0
+        },
+        "answerable": {
+          "n": 9,
+          "pass_rate": 0.889
+        },
+        "multi_doc": {
+          "n": 3,
+          "pass_rate": 1.0
+        },
+        "near_miss": {
+          "n": 4,
+          "pass_rate": 1.0
+        },
+        "off_topic": {
+          "n": 4,
+          "pass_rate": 1.0
+        }
+      }
+    }
+  },
+  "iterations": [],
+  "final": {
+    "overall": {
+      "n": 21,
+      "pass_rate": 0.952,
+      "correct_rate": 0.923,
+      "grounded_rate": 1.0,
+      "refusal_recall": 1.0,
+      "wrong_refusal_rate": 0.0,
+      "retrieval_hit_rate": 1.0,
+      "contract_violation_rate": 0.667
+    },
+    "dev": {
+      "n": 15,
+      "pass_rate": 1.0,
+      "correct_rate": 1.0,
+      "grounded_rate": 1.0,
+      "refusal_recall": 1.0,
+      "wrong_refusal_rate": 0.0,
+      "retrieval_hit_rate": 1.0,
+      "contract_violation_rate": 0.667
+    },
+    "holdout": {
+      "n": 6,
+      "pass_rate": 0.833,
+      "correct_rate": 0.75,
+      "grounded_rate": 1.0,
+      "refusal_recall": 1.0,
+      "wrong_refusal_rate": 0.0,
+      "retrieval_hit_rate": 1.0,
+      "contract_violation_rate": 0.667
+    },
+    "by_category": {
+      "ambiguous": {
+        "n": 1,
+        "pass_rate": 1.0
+      },
+      "answerable": {
+        "n": 9,
+        "pass_rate": 0.889
+      },
+      "multi_doc": {
+        "n": 3,
+        "pass_rate": 1.0
+      },
+      "near_miss": {
+        "n": 4,
+        "pass_rate": 1.0
+      },
+      "off_topic": {
+        "n": 4,
+        "pass_rate": 1.0
+      }
+    }
+  }
+}

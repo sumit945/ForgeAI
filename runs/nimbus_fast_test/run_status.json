@@ -1,0 +1,54 @@
+{
+  "status": "succeeded_with_warnings",
+  "pipeline_version": "2",
+  "stages": [
+    {
+      "name": "intake",
+      "status": "ok",
+      "seconds": 20.9
+    },
+    {
+      "name": "groundability",
+      "status": "ok",
+      "seconds": 32.3
+    },
+    {
+      "name": "generate",
+      "status": "ok",
+      "seconds": 11.5
+    },
+    {
+      "name": "evalset",
+      "status": "ok",
+      "seconds": 219.1
+    },
+    {
+      "name": "calibration",
+      "status": "ok",
+      "seconds": 53.4
+    },
+    {
+      "name": "optimize",
+      "status": "ok",
+      "seconds": 780.3
+    }
+  ],
+  "warnings": [
+    "the model left `sources` empty in 73% of answers; citations were attributed by code"
+  ],
+  "errors": [],
+  "elapsed_seconds": 1121.6,
+  "budget": {
+    "calls": 203,
+    "seconds": 1122.3,
+    "prompt_tokens": 158186,
+    "completion_tokens": 14710,
+    "retries": 0,
+    "failed_calls": 0,
+    "fallbacks_used": 0,
+    "truncated_prompts": 0,
+    "wall_clock_minutes": 18.7,
+    "agent_model": "qwen2.5:3b-instruct",
+    "judge_model": "qwen2.5:3b-instruct"
+  }
+}

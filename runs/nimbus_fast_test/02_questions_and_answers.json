@@ -1,0 +1,46 @@
+{
+  "max_questions": 5,
+  "asked": 5,
+  "qa": [
+    {
+      "id": "q1",
+      "question": "What specific audience should the assistant be prepared to answer questions for (e.g., residential, commercial)?",
+      "why": "The brief does not specify the audience, which could affect the scope and tone of the assistant.",
+      "default": "Residential subscribers",
+      "answer": "Residential subscribers",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q2",
+      "question": "Should the assistant be able to provide information about mobile or TV services, even if not requested by the user?",
+      "why": "The brief specifies that the assistant should not give information about mobile or TV services, but the default behavior is not clear.",
+      "default": "No",
+      "answer": "No",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q3",
+      "question": "Should the assistant be able to compare Nimbus Fibre broadband plans with other companies' services?",
+      "why": "The brief specifies that the assistant should not compare with other companies, but the default behavior is not clear.",
+      "default": "No",
+      "answer": "No",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q4",
+      "question": "What is the strictness level for the assistant when enforcing the Terms of Service? (e.g., strict, lenient, moderate)",
+      "why": "The brief does not specify the strictness level, which could affect how the assistant handles user queries and compliance with the Terms of Service.",
+      "default": "Moderate",
+      "answer": "Moderate",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q5",
+      "question": "Should the assistant be able to handle questions about mobile or TV services?",
+      "why": "The brief specifies that the assistant should not give information about mobile or TV services, but the default behavior is not clear.",
+      "default": "No",
+      "answer": "No",
+      "source": "assumed-default"
+    }
+  ]
+}

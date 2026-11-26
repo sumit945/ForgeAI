@@ -1,0 +1,162 @@
+{
+  "status": "warn",
+  "purpose_check": {
+    "topic": "To provide precise and friendly answers to HR policy questions for Meridian Maritime shore staff.",
+    "coverage": 0.5,
+    "top_docs": [
+      "conduct_grievance_and_travel.pdf",
+      "leave_policy.pdf",
+      "working_hours_and_overtime.pdf"
+    ],
+    "evidence_sentence": null,
+    "llm_verdict": "no",
+    "quote": "",
+    "quote_verified": false,
+    "notes": [],
+    "verdict": "unsupported"
+  },
+  "topics": [
+    {
+      "topic": "Annual leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Full-time shore staff are entitled to 24 working days of paid annual leave per calendar year.",
+      "llm_verdict": "yes",
+      "quote": "Employees in their probation period (the first 6 months of employment) accrue leave normally but may take no more than 5 days of leave during probation.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Sick leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Employees receive 12 paid sick days per calendar year.",
+      "llm_verdict": "yes",
+      "quote": "Employees in their probation period (the first 6 months of employment) accrue leave normally but may take no more than 5 days of leave during probation.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Parental leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Birth mothers receive 26 weeks of maternity leave on full pay.",
+      "llm_verdict": "yes",
+      "quote": "Fathers and partners receive 4 weeks of paternity leave on full pay, which must be taken within 6 months of the birth.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Bereavement leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "Adoptive parents receive 12 weeks of leave on full pay.",
+      "llm_verdict": "yes",
+      "quote": "Employees receive 5 days of paid leave on the death of an immediate family member (spouse, partner, child, parent, sibling) and 2 days for an extended family member.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Unpaid leave",
+      "coverage": 1.0,
+      "top_docs": [
+        "leave_policy.pdf"
+      ],
+      "evidence_sentence": "After 2 years of service an employee may request up to 30 days of unpaid leave in a calendar year.",
+      "llm_verdict": "no",
+      "quote": "Adoptive parents receive 12 weeks of leave on full pay.",
+      "quote_verified": true,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"After 2 years of service an employee may request up to 30 days of unpaid leave in a calendar year.\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Working hours",
+      "coverage": 1.0,
+      "top_docs": [
+        "working_hours_and_overtime.pdf"
+      ],
+      "evidence_sentence": "No employee may work more than 10 hours of overtime in a single week.",
+      "llm_verdict": "yes",
+      "quote": "Overtime must be approved in advance by the line manager. Unapproved overtime is not paid.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Overtime",
+      "coverage": 1.0,
+      "top_docs": [
+        "working_hours_and_overtime.pdf"
+      ],
+      "evidence_sentence": "Overtime must be approved in advance by the line manager.",
+      "llm_verdict": "yes",
+      "quote": "Overtime must be approved in advance by the line manager. Unapproved overtime is not paid.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Conduct",
+      "coverage": 1.0,
+      "top_docs": [
+        "conduct_grievance_and_travel.pdf"
+      ],
+      "evidence_sentence": null,
+      "llm_verdict": "partial",
+      "quote": "Step 1: the employee should first try to resolve the matter informally with their line manager within 10 working days of the incident.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "partial"
+    },
+    {
+      "topic": "Grievance",
+      "coverage": 1.0,
+      "top_docs": [
+        "conduct_grievance_and_travel.pdf"
+      ],
+      "evidence_sentence": null,
+      "llm_verdict": "yes",
+      "quote": "Step 1: the employee should first try to resolve the matter informally with their line manager within 10 working days of the incident.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Health insurance and pension contributions",
+      "coverage": 0.0,
+      "top_docs": [],
+      "evidence_sentence": null,
+      "llm_verdict": null,
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "no document text overlaps this topic"
+      ],
+      "verdict": "unsupported"
+    }
+  ],
+  "summary": {
+    "supported": 8,
+    "partial": 1,
+    "unsupported": 1,
+    "ignored_not_in_brief": 0
+  },
+  "known_gaps": [
+    "Health insurance and pension contributions"
+  ],
+  "message": "Some requested topics are weakly or not supported. Unsupported topics were removed from scope and will be refused, not guessed."
+}

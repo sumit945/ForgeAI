@@ -1,0 +1,8 @@
+[optimizer] baseline evaluation (23 cases)
+[optimizer] iteration 1: dev pass 50%; failures {'retrieval_miss': 7, 'prompt_defect': 1}
+[optimizer]   accepted: dev 50% -> 81%; fixed ['amb-01', 'amb-02', 'ans-03', 'ans-04', 'ans-06', 'ans-09', 'mul-01']
+[optimizer] iteration 2: dev pass 81%; failures {'prompt_defect': 3}
+[optimizer]   REVERTED: dev pass-rate 81% -> 81% (no strict improvement)
+[optimizer] iteration 3: dev pass 81%; failures {'prompt_defect': 3}
+done -> C:\Users\Admin\Desktop\MARI APP Project\runs\optimizer_repair_demo\SUMMARY.md
+exit=0

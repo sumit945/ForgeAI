@@ -1,0 +1,18 @@
+[
+  {
+    "id": "mul-01",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What events qualify as a Force Majeure Event under the terms of service? Also, how long does Nimbus need to notify Subscribers about changes that could harm them before implementing those changes?",
+    "answer": "A Force Majeure Event includes events beyond Nimbus's reasonable control such as flood, earthquake, cyclone, fire, epidemic, war, terrorism, a government order, a strike, the failure of a third-party power or telecom supplier, or a theft or cutting of cable by third parties.",
+    "notes": []
+  },
+  {
+    "id": "ans-09",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "When does Nimbus notify customers about the end of a commitment and what is the consequence if they choose to renew?",
+    "answer": "Nimbus will tell you 30 days before the end of the commitment, and you may choose a new commitment.",
+    "notes": []
+  }
+]

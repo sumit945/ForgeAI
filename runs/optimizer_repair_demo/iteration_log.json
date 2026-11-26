@@ -1,0 +1,291 @@
+{
+  "baseline": {
+    "iteration": 0,
+    "definition_hash": "16daf71f63",
+    "scorecard": {
+      "overall": {
+        "n": 23,
+        "pass_rate": 0.478,
+        "correct_rate": 0.2,
+        "grounded_rate": 0.533,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.4,
+        "retrieval_hit_rate": 0.267,
+        "contract_violation_rate": 0.348
+      },
+      "dev": {
+        "n": 16,
+        "pass_rate": 0.5,
+        "correct_rate": 0.2,
+        "grounded_rate": 0.4,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.6,
+        "retrieval_hit_rate": 0.3,
+        "contract_violation_rate": 0.188
+      },
+      "holdout": {
+        "n": 7,
+        "pass_rate": 0.429,
+        "correct_rate": 0.2,
+        "grounded_rate": 0.8,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 0.2,
+        "contract_violation_rate": 0.714
+      },
+      "by_category": {
+        "ambiguous": {
+          "n": 3,
+          "pass_rate": 0.0
+        },
+        "answerable": {
+          "n": 9,
+          "pass_rate": 0.333
+        },
+        "multi_doc": {
+          "n": 3,
+          "pass_rate": 0.0
+        },
+        "near_miss": {
+          "n": 4,
+          "pass_rate": 1.0
+        },
+        "off_topic": {
+          "n": 4,
+          "pass_rate": 1.0
+        }
+      }
+    }
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "accepted": true,
+      "score_before": {
+        "dev": 0.5,
+        "holdout": 0.429,
+        "overall": 0.478
+      },
+      "score_after": {
+        "dev": 0.812,
+        "holdout": 0.571,
+        "overall": 0.739
+      },
+      "failures_classified": [
+        {
+          "id": "ans-03",
+          "category": "retrieval_miss",
+          "why": "refused because the needed passage was not in the retrieved context",
+          "question": "What is the duration of the warranty for Pacific Valve and Pump parts?",
+          "answer": "I can't answer that from the documents I have. For this, please contact Users should contact their fleet procurement department.",
+          "notes": [
+            "no source cited"
+          ]
+        },
+        {
+          "id": "ans-04",
+          "category": "retrieval_miss",
+          "why": "refused because the needed passage was not in the retrieved context",
+          "question": "What is the minimum order value that requires approval from the Technical Director according to the fleet procurement procedure?",
+          "answer": "The minimum order value that requires approval from the Technical Director according to the fleet procurement procedure is not specified in the provided context. For this, please contact the fleet procurement department.",
+          "notes": [
+            "no source cited"
+          ]
+        },
+        {
+          "id": "ans-06",
+          "category": "retrieval_miss",
+          "why": "refused because the needed passage was not in the retrieved context",
+          "question": "How long is the warranty period for Pacific Valve and Pump parts?",
+          "answer": "I can't answer that from the documents I have. For this, please contact Users should contact their fleet procurement department.",
+          "notes": [
+            "no source cited"
+          ]
+        },
+        {
+          "id": "ans-09",
+          "category": "retrieval_miss",
+          "why": "answer lacks the expected facts and the needed passage was not retrieved",
+          "question": "What is the freight charge for orders below 2500 USD?",
+          "answer": "Freight is a flat 250 USD to any port, regardless of order value.",
+          "notes": [
+            "LLM judge reports contradiction"
+          ]
+        },
+        {
+          "id": "amb-02",
+          "category": "retrieval_miss",
+          "why": "refused because the needed passage was not in the retrieved context",
+          "question": "What's the min order val for Tech Dir to approve?",
+          "answer": "The document does not specify the minimum order value for the Technical Director to approve.",
+          "notes": [
+            "no source cited"
+          ]
+        },
+        {
+          "id": "amb-03",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "... Whats the max time to check delivery and report probs like no parts or broke stuff?",
+          "answer": "The max time to check delivery and report problems like no parts or broken stuff is 48 hours.",
+          "notes": []
+        },
+        {
+          "id": "mul-01",
+          "category": "retrieval_miss",
+          "why": "refused because the needed passage was not in the retrieved context",
+          "question": "What is the minimum order value that requires approval from the Technical Director according to the fleet procurement procedure? Also, what is the duration of the warranty for Pacific Valve and Pump parts?",
+          "answer": "The minimum order value that requires approval from the Technical Director is not provided in the given documents. For this, please contact the fleet procurement department.",
+          "notes": [
+            "no source cited"
+          ]
+        },
+        {
+          "id": "mul-02",
+          "category": "retrieval_miss",
+          "why": "refused because the needed passage was not in the retrieved context",
+          "question": "What is the part number for the Engine category with a criticality class of A and a unit price of $412.50? Also, how long is the warranty period for Pacific Valve and Pump parts?",
+          "answer": "I can't answer that from the documents I have. For this, please contact Users should contact their fleet procurement department.",
+          "notes": [
+            "no source cited"
+          ]
+        }
+      ],
+      "failure_counts_before": {
+        "retrieval_miss": 7,
+        "prompt_defect": 1
+      },
+      "changes": [
+        {
+          "type": "set_param",
+          "target": "knowledge.retrieval.top_k",
+          "before": 1,
+          "after": 3,
+          "why": "evidence ranked [2, 2, 2, 2, 2, 2, 3] but only top 1 are passed to the model",
+          "cases": [
+            "ans-03",
+            "ans-04",
+            "ans-06",
+            "ans-09",
+            "amb-02",
+            "mul-01",
+            "mul-02"
+          ],
+          "category": "retrieval_miss"
+        },
+        {
+          "type": "add_prompt_rule",
+          "target": "system_prompt.rules[fix-prompt_defect-5]",
+          "before": null,
+          "after": "Include all required facts and citations from the retrieved passage to ensure the answer is comprehensive.",
+          "origin": "llm",
+          "category": "prompt_defect",
+          "why": "1 case(s): the assistant had the right context but omitted required facts, ignored scope, or skipped citations",
+          "cases": [
+            "amb-03"
+          ]
+        }
+      ],
+      "failures_targeted": [
+        "amb-02",
+        "amb-03",
+        "ans-03",
+        "ans-04",
+        "ans-06",
+        "ans-09",
+        "mul-01",
+        "mul-02"
+      ],
+      "fixed": [
+        "amb-01",
+        "amb-02",
+        "ans-03",
+        "ans-04",
+        "ans-06",
+        "ans-09",
+        "mul-01"
+      ],
+      "regressed": [
+        "ans-08"
+      ],
+      "definition_hash_before": "16daf71f63",
+      "definition_hash_after": "b270c8d098",
+      "decision": "accepted: dev pass-rate improved"
+    },
+    {
+      "iteration": 2,
+      "accepted": false,
+      "score_before": {
+        "dev": 0.812,
+        "holdout": 0.571,
+        "overall": 0.739
+      },
+      "score_after": {
+        "dev": 0.812,
+        "holdout": 0.429,
+        "overall": 0.696
+      },
+      "failures_classified": [
+        {
+          "id": "ans-08",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "What is the freight cost for orders above 10,000 USD?",
+          "answer": "The freight cost for orders above 10,000 USD is 250 USD to any port.",
+          "notes": []
+        },
+        {
+          "id": "amb-03",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "... Whats the max time to check delivery and report probs like no parts or broke stuff?",
+          "answer": "The max time to check delivery and report problems like no parts or broken stuff is within 48 hours.",
+          "notes": []
+        },
+        {
+          "id": "mul-02",
+          "category": "prompt_defect",
+          "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+          "question": "What is the part number for the Engine category with a criticality class of A and a unit price of $412.50? Also, how long is the warranty period for Pacific Valve and Pump parts?",
+          "answer": "The part number for the Engine category with a criticality class of A and a unit price of $412.50 is MP-1001. The warranty period for Pacific Valve and Pump parts is 18 months.",
+          "notes": [
+            "none of the evidence quotes appear in the retrieved context"
+          ]
+        }
+      ],
+      "failure_counts_before": {
+        "prompt_defect": 3
+      },
+      "changes": [
+        {
+          "type": "add_prompt_rule",
+          "target": "system_prompt.rules[fix-prompt_defect-6]",
+          "before": null,
+          "after": "Include every specific number, date, condition and exception from the relevant excerpts, and always cite the source file names.",
+          "origin": "fallback-template",
+          "category": "prompt_defect",
+          "why": "3 case(s): the assistant had the right context but omitted required facts, ignored scope, or skipped citations",
+          "cases": [
+            "ans-08",
+            "amb-03",
+            "mul-02"
+          ]
+        }
+      ],
+      "failures_targeted": [
+        "amb-03",
+        "ans-08",
+        "mul-02"
+      ],
+      "fixed": [],
+      "regressed": [
+        "ans-05"
+      ],
+      "definition_hash_before": "b270c8d098",
+      "definition_hash_after": "1cdcf5b726",
+      "decision": "REVERTED: dev pass-rate 81% -> 81% (no strict improvement)",
+      "ablation_trials": []
+    }
+  ],
+  "stop_reason": "no applicable targeted fix remains"
+}

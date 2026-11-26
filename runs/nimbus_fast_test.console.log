@@ -1,0 +1,19 @@
+[1/7] intake: 1 documents loaded
+[2/7] requirements written (5 clarifying question(s) asked)
+[3/7] groundability: OK - {'supported': 6, 'partial': 0, 'unsupported': 0, 'ignored_not_in_brief': 2}
+      retrieval: hybrid BM25 + bge-m3
+[4/7] agent generated; tools attached: none
+[5/7] eval set: 22 cases {'answerable': 9, 'ambiguous': 4, 'multi_doc': 3, 'near_miss': 2, 'off_topic': 4} (rejected 34 unverifiable candidates)
+[6/7] judge calibration: reliability=0.92
+[optimizer] baseline evaluation (22 cases)
+[optimizer] iteration 1: dev pass 81%; failures {'wrong_refusal': 1, 'prompt_defect': 2}
+[optimizer]   REVERTED: dev pass-rate 81% -> 81% (no strict improvement)
+[optimizer]   ablation 'prompt_defect' alone: dev 81% -> 81%
+[optimizer]   ablation 'wrong_refusal' alone: dev 81% -> 88%
+[optimizer] iteration 2: dev pass 88%; failures {'prompt_defect': 2}
+[optimizer]   REVERTED: dev pass-rate 88% -> 81% (no strict improvement)
+[optimizer] iteration 3: dev pass 88%; failures {'prompt_defect': 2}
+      warning: the model left `sources` empty in 73% of answers; citations were attributed by code
+[7/7] done in 18.7 min [succeeded_with_warnings] -> runs\nimbus_fast_test\REPORT.md
+
+Finished with 1 warning(s) - see runs/nimbus_fast_test/REPORT.md section 0.

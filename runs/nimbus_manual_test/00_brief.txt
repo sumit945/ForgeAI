@@ -1,0 +1,1 @@
+I need an assistant that answers questions from Nimbus Fibre broadband subscribers about plans, pricing, billing, fees, support and cancellation, using the Terms of Service. It must not give information about mobile or TV services or compare with other companies.

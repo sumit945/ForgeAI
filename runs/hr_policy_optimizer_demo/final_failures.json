@@ -1,0 +1,10 @@
+[
+  {
+    "id": "ans-02",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What are the conditions for employees to work remotely and when must timesheets be submitted?",
+    "answer": "Employees may work remotely up to 2 days per week with their line manager's agreement after completing probation. Timesheets must be submitted by the 25th of each month.",
+    "notes": []
+  }
+]

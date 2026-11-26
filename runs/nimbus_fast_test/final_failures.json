@@ -1,0 +1,39 @@
+[
+  {
+    "id": "ans-03",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What is the minimum late payment fee and when does it apply?",
+    "answer": "The minimum late payment fee is Rs. 50 per invoice and it applies when an invoice is not paid by the due date.",
+    "notes": []
+  },
+  {
+    "id": "ans-09",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "When is a connection considered closed after a suspension for non-payment?",
+    "answer": "A connection is considered closed after the Equipment has been returned, as described in Section 9 of the Terms of Service.",
+    "notes": [
+      "LLM judge reports contradiction",
+      "LLM judge found an unsupported claim (quote verified)"
+    ]
+  },
+  {
+    "id": "mul-01",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What is the minimum late payment fee and when does it apply? Also, when does a promotion code expire if used on a connection, and what is the maximum number of promotion codes that can be used simultaneously?",
+    "answer": "The minimum late payment fee is Rs. 50 per invoice. It applies when an invoice is not paid by the due date and a late payment fee of 2% per month on the overdue amount is applied, with a minimum of Rs. 50 per invoice. A promotion code cannot be used after registration and cannot be used again to a c",
+    "notes": [
+      "LLM judge reports contradiction"
+    ]
+  },
+  {
+    "id": "mul-02",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "When should a billing dispute be raised to ensure a timely resolution according to the terms of service? Also, what is the maximum number of times a customer can downgrade their plan within a six-month period?",
+    "answer": "A billing dispute must be raised within 30 days of the invoice date, and Nimbus will give a decision within 15 days of the dispute being raised. The maximum number of times a customer can downgrade their plan within a six-month period is once.",
+    "notes": []
+  }
+]

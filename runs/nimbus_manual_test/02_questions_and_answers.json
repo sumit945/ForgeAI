@@ -1,0 +1,46 @@
+{
+  "max_questions": 5,
+  "asked": 5,
+  "qa": [
+    {
+      "id": "q1",
+      "question": "What specific audience should the assistant be prepared to answer questions for (e.g., residential, commercial)?",
+      "why": "The brief does not specify the audience, which could affect the scope and tone of the assistant.",
+      "default": "Residential subscribers",
+      "answer": "Residential subscribers",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q2",
+      "question": "Should the assistant be able to provide information about mobile or TV services, even if not requested by the user?",
+      "why": "The brief specifies that the assistant should not give information about mobile or TV services, but the default behavior might be to include such information.",
+      "default": "No",
+      "answer": "No",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q3",
+      "question": "Should the assistant refuse to answer questions about mobile or TV services, regardless of the user's request?",
+      "why": "The brief specifies that the assistant should not give information about mobile or TV services, but the default behavior might be to include such information.",
+      "default": "Yes",
+      "answer": "Yes",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q4",
+      "question": "Should the assistant be strict about the Terms of Service and refuse to answer questions that contradict or go beyond the terms?",
+      "why": "The brief specifies that the assistant must use the Terms of Service, but the default behavior might be to be more flexible.",
+      "default": "Yes",
+      "answer": "Yes",
+      "source": "assumed-default"
+    },
+    {
+      "id": "q5",
+      "question": "Who should the escalation contact be for customer inquiries (e.g., customer service, technical support)?",
+      "why": "The brief does not specify an escalation contact, which could affect how customer inquiries are handled.",
+      "default": "Customer Service",
+      "answer": "Customer Service",
+      "source": "assumed-default"
+    }
+  ]
+}

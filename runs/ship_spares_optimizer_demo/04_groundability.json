@@ -1,0 +1,166 @@
+{
+  "status": "ok",
+  "purpose_check": {
+    "topic": "To provide precise and concise answers to technical superintendents and fleet managers about spare parts, including pricing, lead times, stock availability, supplier terms, and order approvals.",
+    "coverage": 0.55,
+    "top_docs": [
+      "procurement_procedure.pdf",
+      "supplier_terms.pdf"
+    ],
+    "evidence_sentence": null,
+    "llm_verdict": "partial",
+    "quote": "An order must never be split to stay under an approval limit.",
+    "quote_verified": true,
+    "notes": [],
+    "verdict": "partial"
+  },
+  "topics": [
+    {
+      "topic": "Part numbers",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "Every purchase order must record the part number from the catalogue, the supplier code, the unit price in USD and the vessel name.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"Every purchase order must record the part number from the catalogue, the supplier code, the unit price in USD \" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Unit prices",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "Every purchase order must record the part number from the catalogue, the supplier code, the unit price in USD and the vessel name.",
+      "llm_verdict": "yes",
+      "quote": "unit price in USD",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Lead times",
+      "coverage": 0.5,
+      "top_docs": [
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "part_no: MP-1001; description: Fuel injector, main engine; category: Engine; criticality_class: A; supplier_code: HLM; unit_price_usd: 412.5; lead_time_days: 21; stock_on_hand: 6; min_order_qty: 2",
+      "llm_verdict": "yes",
+      "quote": "lead_time_days: 21",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Stock availability",
+      "coverage": 0.5,
+      "top_docs": [
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "part_no: MP-1001; description: Fuel injector, main engine; category: Engine; criticality_class: A; supplier_code: HLM; unit_price_usd: 412.5; lead_time_days: 21; stock_on_hand: 6; min_order_qty: 2",
+      "llm_verdict": "yes",
+      "quote": "MP-1018; description: Heat exchanger tube bundle; category: Cooling; criticality_class: C; supplier_code: NWE; unit_price_usd: 7420.0; lead_time_days: 49; stock_on_hand: 1; min_order_qty: 1",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Supplier terms",
+      "coverage": 1.0,
+      "top_docs": [
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "SUPPLIER TERMS OF TRADE - APPROVED SPARES SUPPLIERS",
+      "llm_verdict": "yes",
+      "quote": "An order discount of 5 percent applies to orders with a value above 5,000 USD before freight.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Approval limits",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "An order must never be split to stay under an approval limit.",
+      "llm_verdict": "yes",
+      "quote": "Purchase orders up to 2,000 USD may be approved by the Technical Superintendent.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Total order cost",
+      "coverage": 0.67,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "Freight is charged at cost, quoted per order.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"Freight is charged at cost, quoted per order.\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Critical spares",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "supplier_terms.pdf"
+      ],
+      "evidence_sentence": "Parts marked with criticality class C in the catalogue are critical spares: a vessel must never be without at least one on board.",
+      "llm_verdict": "no",
+      "quote": "",
+      "quote_verified": false,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"Parts marked with criticality class C in the catalogue are critical spares: a vessel must never be without at \" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Emergency purchases",
+      "verdict": "not_requested",
+      "coverage": null,
+      "notes": [
+        "not asked for in the brief (added by the requirements model); ignored and removed from scope"
+      ]
+    },
+    {
+      "topic": "Fuel prices",
+      "coverage": 1.0,
+      "top_docs": [
+        "procurement_procedure.pdf",
+        "spares_catalogue.csv"
+      ],
+      "evidence_sentence": "Prices in other currencies must be converted at the rate published by Finance on the day the order is raised.",
+      "llm_verdict": "no",
+      "quote": "part_price_usd: 54.2",
+      "quote_verified": true,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"Prices in other currencies must be converted at the rate published by Finance on the day the order is raised.\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    }
+  ],
+  "summary": {
+    "supported": 9,
+    "partial": 0,
+    "unsupported": 0,
+    "ignored_not_in_brief": 1
+  },
+  "known_gaps": [],
+  "message": "All requested topics are supported by the documents."
+}

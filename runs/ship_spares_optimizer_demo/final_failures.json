@@ -1,0 +1,26 @@
+[
+  {
+    "id": "ans-07",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What is the part number for the Engine category with the highest criticality class and a unit price less than $1000?",
+    "answer": "The part number for the Engine category with the highest criticality class and a unit price less than $1000 is MP-1001.",
+    "notes": []
+  },
+  {
+    "id": "amb-01",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What MP# has the most rope in safety?",
+    "answer": "MP-1025 has the most rope (32 mm, 100 m) in the safety category.",
+    "notes": []
+  },
+  {
+    "id": "mul-03",
+    "category": "prompt_defect",
+    "why": "passage was retrieved and answer is grounded, but required facts/citation are missing",
+    "question": "What is the part number for the Engine category with the highest criticality class and a unit price less than $1000? Also, what is the freight charge for orders below 2500 USD?",
+    "answer": "The part number for the Engine category with the highest criticality class (A) and a unit price less than $1000 is MP-1015. The freight charge for orders below 2500 USD is 120 USD.",
+    "notes": []
+  }
+]

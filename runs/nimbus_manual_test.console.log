@@ -1,0 +1,12 @@
+[1/7] intake: 1 documents loaded
+[2/7] requirements written (5 clarifying question(s) asked)
+[3/7] groundability: OK - {'supported': 6, 'partial': 0, 'unsupported': 0, 'ignored_not_in_brief': 4}
+      retrieval: hybrid BM25 + bge-m3
+[4/7] agent generated; tools attached: none
+[5/7] eval set: 21 cases {'answerable': 12, 'multi_doc': 3, 'near_miss': 2, 'off_topic': 4} (rejected 110 unverifiable candidates)
+[6/7] judge calibration: reliability=1.0
+[optimizer] baseline evaluation (21 cases)
+      warning: the model left `sources` empty in 71% of answers; citations were attributed by code
+[7/7] done in 15.2 min [succeeded_with_warnings] -> runs\nimbus_manual_test\REPORT.md
+
+Finished with 1 warning(s) - see runs/nimbus_manual_test/REPORT.md section 0.

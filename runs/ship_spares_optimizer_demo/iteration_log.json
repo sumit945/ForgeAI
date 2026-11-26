@@ -1,0 +1,62 @@
+{
+  "baseline": {
+    "iteration": 0,
+    "definition_hash": "d6a8a6c9f6",
+    "scorecard": {
+      "overall": {
+        "n": 23,
+        "pass_rate": 0.87,
+        "correct_rate": 0.8,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.87
+      },
+      "dev": {
+        "n": 16,
+        "pass_rate": 1.0,
+        "correct_rate": 1.0,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.875
+      },
+      "holdout": {
+        "n": 7,
+        "pass_rate": 0.571,
+        "correct_rate": 0.4,
+        "grounded_rate": 1.0,
+        "refusal_recall": 1.0,
+        "wrong_refusal_rate": 0.0,
+        "retrieval_hit_rate": 1.0,
+        "contract_violation_rate": 0.857
+      },
+      "by_category": {
+        "ambiguous": {
+          "n": 3,
+          "pass_rate": 0.667
+        },
+        "answerable": {
+          "n": 9,
+          "pass_rate": 0.889
+        },
+        "multi_doc": {
+          "n": 3,
+          "pass_rate": 0.667
+        },
+        "near_miss": {
+          "n": 4,
+          "pass_rate": 1.0
+        },
+        "off_topic": {
+          "n": 4,
+          "pass_rate": 1.0
+        }
+      }
+    }
+  },
+  "iterations": [],
+  "stop_reason": "no failures left on the dev split"
+}

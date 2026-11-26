@@ -1,0 +1,124 @@
+{
+  "status": "ok",
+  "purpose_check": {
+    "topic": "To provide answers to questions about Nimbus Fibre broadband plans, pricing, billing, fees, support, and cancellation using the Terms of Service as the only source of information.",
+    "coverage": 0.61,
+    "top_docs": [
+      "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+    ],
+    "evidence_sentence": null,
+    "llm_verdict": "partial",
+    "quote": "Nimbus will tell you after a feasibility check, normally within 2 Business Days, whether your address can be connected.",
+    "quote_verified": true,
+    "notes": [],
+    "verdict": "partial"
+  },
+  "topics": [
+    {
+      "topic": "Plans",
+      "coverage": 1.0,
+      "top_docs": [
+        "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+      ],
+      "evidence_sentence": "16.4 If you are on a discounted commitment and move to a different plan, the discount percentage continues to apply to the new plan's Monthly Rental.",
+      "llm_verdict": "yes",
+      "quote": "A downgrade to a lower plan takes effect from the start of the next Billing Cycle.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Pricing",
+      "coverage": 1.0,
+      "top_docs": [
+        "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+      ],
+      "evidence_sentence": "Service Plans and Pricing 3.1 Nimbus offers four home plans.",
+      "llm_verdict": "yes",
+      "quote": "Nimbus Lite delivers up to 50 Mbps for a Monthly Rental of Rs. 499.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Billing",
+      "coverage": 1.0,
+      "top_docs": [
+        "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+      ],
+      "evidence_sentence": "Billing Cycle and Payment Methods 5.1 Nimbus bills in advance.",
+      "llm_verdict": "yes",
+      "quote": "5.2 You may pay by UPI, debit card, credit card, net banking, or the auto-debit e-mandate set up in the Nimbus app. UPI and net banking carry no extra charge. Credit card payments carry a convenience fee of 1.5% of the amount, plus GST on that fee.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Fees",
+      "coverage": 1.0,
+      "top_docs": [
+        "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+      ],
+      "evidence_sentence": "300 Section 6 Installation fee (month-to-month) Rs.",
+      "llm_verdict": "no",
+      "quote": "300 Section 6 Installation fee (month-to-month) Rs.\n1,",
+      "quote_verified": true,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"300 Section 6 Installation fee (month-to-month) Rs.\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Support",
+      "coverage": 1.0,
+      "top_docs": [
+        "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+      ],
+      "evidence_sentence": "Customer Support and Escalation 14.1 Support is available 24 hours a day, 7 days a week on the toll-free helpline 1800-555-0142, on WhatsApp at +91 90000 55142, through the Nimbus app, and by e-mail at support@nimbusfibre.example.",
+      "llm_verdict": "no",
+      "quote": "Nimbus is not liable for any loss caused by a delay in restoring service except as set out in Section 12.",
+      "quote_verified": true,
+      "notes": [
+        "LLM said \"no\" but the documents state: \"Customer Support and Escalation 14.1 Support is available 24 hours a day, 7 days a week on the toll-free helpl\" -> supported by deterministic evidence"
+      ],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Cancellation",
+      "coverage": 1.0,
+      "top_docs": [
+        "Nimbus_Fibre_Broadband_Terms_of_Service.pdf"
+      ],
+      "evidence_sentence": "Refunds and Cancellations 20.1 A new Subscriber may cancel within 7 days of activation (a cooling-off period) and receive a refund of the rental paid, less the rental for the days already used.",
+      "llm_verdict": "yes",
+      "quote": "20.2 After the cooling-off period, no refund of rental is given for a mid-cycle cancellation. The connection stays active until the end of the notice period.",
+      "quote_verified": true,
+      "notes": [],
+      "verdict": "supported"
+    },
+    {
+      "topic": "Fair Usage Policy",
+      "verdict": "not_requested",
+      "coverage": null,
+      "notes": [
+        "not asked for in the brief (added by the requirements model); ignored and removed from scope"
+      ]
+    },
+    {
+      "topic": "Speed and Performance Commitments",
+      "verdict": "not_requested",
+      "coverage": null,
+      "notes": [
+        "not asked for in the brief (added by the requirements model); ignored and removed from scope"
+      ]
+    }
+  ],
+  "summary": {
+    "supported": 6,
+    "partial": 0,
+    "unsupported": 0,
+    "ignored_not_in_brief": 2
+  },
+  "known_gaps": [],
+  "message": "All requested topics are supported by the documents."
+}
